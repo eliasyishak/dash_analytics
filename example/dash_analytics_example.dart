@@ -58,6 +58,8 @@ void main() async {
   DateTime start = DateTime.now();
   print('###### START ###### $start');
 
+  print(analytics.telemetryEnabled);
+
   DateTime end = DateTime.now();
   print(
       '###### DONE ###### ${DateTime.now()} ${end.difference(start).inMilliseconds}ms');

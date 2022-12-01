@@ -1,6 +1,9 @@
+import 'config_handler.dart';
 import 'initializer.dart';
 
 class Analytics {
+  final ConfigHandler _configHandler;
+
   Analytics({
     required tool,
     required homeDirectory,
@@ -12,7 +15,7 @@ class Analytics {
     required flutterVersion,
     required dartVersion,
     bool? forceReset,
-  }) {
+  }) : _configHandler = ConfigHandler(homeDirectory: homeDirectory) {
     // This initializer class will let the instance know
     // if it was the first run; if it is, nothing will be sent
     // on the first run
@@ -24,5 +27,9 @@ class Analytics {
       forceReset: forceReset ?? false,
     );
     initializer.run();
+  }
+
+  bool get telemetryEnabled {
+    return _configHandler.telemetryEnabled;
   }
 }
