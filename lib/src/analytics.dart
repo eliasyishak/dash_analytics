@@ -34,6 +34,7 @@ class Analytics {
     // tool message and version have been updated from what
     // is in the current file; if there is a new message version
     // make the necessary updates
+    // ignore: unused_local_variable TODO: remove after increment method implemented
     bool messagePrinted = false;
     if (!_configHandler.parsedTools.containsKey(tool)) {
       _configHandler.addTool(tool: tool);
