@@ -80,6 +80,32 @@ class ConfigHandler {
       }
     });
   }
+
+  /// Responsibe for the creation of the configuration line
+  /// for the tool being passed in by the user and adding a
+  /// [ToolInfo] object
+  void addTool({required String tool}) {
+    // Increment the version number of any existing tools
+    // that already exist in configuration file by using
+    // the [incrementToolVersion] method
+    if (parsedTools.containsKey(tool)) {
+      // TODO: implement method to increment the tool if it
+      //  already exists in the config file
+    }
+
+    // Create the new instance of [ToolInfo] to be added
+    // to the [parsedTools] map
+    final DateTime now = DateTime.now();
+    parsedTools[tool] = ToolInfo(lastRun: now, versionNumber: 1);
+
+    // New string to be appended to the bottom of the configuration file
+    // with a newline character for new tools to be added
+    String newTool = '$tool=$dateStamp,1\n';
+    if (!configFile.readAsStringSync().endsWith('\n')) {
+      newTool = '\n$newTool';
+    }
+    configFile.writeAsStringSync(newTool, mode: FileMode.append);
+  }
 }
 
 class ToolInfo {

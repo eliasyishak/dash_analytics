@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'config_handler.dart';
 import 'initializer.dart';
 
@@ -27,6 +29,17 @@ class Analytics {
       forceReset: forceReset ?? false,
     );
     initializer.run();
+
+    // Initialize the config handler class and check if the
+    // tool message and version have been updated from what
+    // is in the current file; if there is a new message version
+    // make the necessary updates
+    bool messagePrinted = false;
+    if (!_configHandler.parsedTools.containsKey(tool)) {
+      _configHandler.addTool(tool: tool);
+      stdout.writeln(toolsMessage);
+      messagePrinted = true;
+    }
   }
 
   bool get telemetryEnabled {
