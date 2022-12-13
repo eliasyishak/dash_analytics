@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'config_handler.dart';
 import 'initializer.dart';
 
 class Analytics {
   final ConfigHandler _configHandler;
+  late bool _showMessage;
 
   Analytics({
     required tool,
@@ -29,21 +28,22 @@ class Analytics {
       forceReset: forceReset ?? false,
     );
     initializer.run();
+    _showMessage = initializer.firstRun;
 
     // Initialize the config handler class and check if the
     // tool message and version have been updated from what
     // is in the current file; if there is a new message version
     // make the necessary updates
-    // ignore: unused_local_variable TODO: remove after increment method implemented
-    bool messagePrinted = false;
     if (!_configHandler.parsedTools.containsKey(tool)) {
       _configHandler.addTool(tool: tool);
-      stdout.writeln(toolsMessage);
-      messagePrinted = true;
     }
   }
 
+  /// Boolean indicating whether or not telemetry is enabled
   bool get telemetryEnabled {
     return _configHandler.telemetryEnabled;
   }
+
+  /// Boolean that lets the client know if they should display the message
+  bool get shouldShowMessage => _showMessage;
 }
