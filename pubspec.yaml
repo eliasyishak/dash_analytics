@@ -1,5 +1,5 @@
 name: dash_analytics
-description: A starting point for Dart libraries or applications.
+description: A package for logging analytics for all dash related tooling to Google Analytics
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
@@ -7,6 +7,7 @@ environment:
   sdk: '>=2.19.0-406.0.dev <3.0.0'
 
 dependencies:
+  file: ^6.1.4
   http: ^0.13.5
   intl: ^0.17.0
   path: ^1.8.0

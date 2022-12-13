@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
@@ -16,6 +16,7 @@ const String toolPattern =
     r'^([A-Za-z0-9]+-*[A-Za-z0-9]*)=([0-9]{4}-[0-9]{2}-[0-9]{2}),([0-9]+)$';
 
 class ConfigHandler {
+  final FileSystem fs;
   final Directory homeDirectory;
   final File configFile;
   final File clientIdFile;
@@ -24,13 +25,15 @@ class ConfigHandler {
   /// Reporting enabled unless specified by user
   bool telemetryEnabled = true;
 
-  ConfigHandler({required this.homeDirectory})
-      : configFile = File(p.join(
+  ConfigHandler({
+    required this.fs,
+    required this.homeDirectory,
+  })  : configFile = fs.file(p.join(
           homeDirectory.path,
           '.dart-tool',
           'dart-flutter-telemetry.config',
         )),
-        clientIdFile = File(p.join(
+        clientIdFile = fs.file(p.join(
           homeDirectory.path,
           '.dart-tool',
           'CLIENT_ID',
