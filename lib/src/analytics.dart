@@ -36,6 +36,7 @@ class Analytics {
     // make the necessary updates
     if (!_configHandler.parsedTools.containsKey(tool)) {
       _configHandler.addTool(tool: tool);
+      _showMessage = true;
     }
   }
 
