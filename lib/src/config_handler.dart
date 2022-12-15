@@ -109,6 +109,28 @@ class ConfigHandler {
     }
     configFile.writeAsStringSync(newTool, mode: FileMode.append);
   }
+
+  /// Disables the reporting capabilities if true is passed
+  void enableTelemetry(bool reportingBool) {
+    final String flag = reportingBool ? '1' : '0';
+    final String configString = configFile.readAsStringSync();
+
+    final RegExp regex = RegExp(disableTelemetryPattern, multiLine: true);
+    final Iterable<RegExpMatch> matches = regex.allMatches(configString);
+
+    // TODO: need to determine what to do when there are two lines for the reporting
+    //  flag; currently assuming that there will only be one
+    if (matches.length == 1) {
+      final String newTelemetryString = 'reporting=$flag';
+
+      final String newConfigString =
+          configString.replaceAll(regex, newTelemetryString);
+
+      configFile.writeAsStringSync(newConfigString);
+
+      telemetryEnabled = reportingBool;
+    }
+  }
 }
 
 class ToolInfo {
