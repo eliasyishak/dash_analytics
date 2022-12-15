@@ -1,5 +1,6 @@
 import 'package:file/file.dart';
 import 'package:file/local.dart';
+import 'package:file/memory.dart';
 
 import 'config_handler.dart';
 import 'initializer.dart';
@@ -8,15 +9,15 @@ abstract class Analytics {
   /// The default factory constructor that will return an implementation
   /// of the [Analytics] abstract class using the [LocalFileSystem]
   factory Analytics({
-    required tool,
-    required homeDirectory,
-    required measurementId,
-    required apiSecret,
-    required toolsMessageVersion,
-    required toolsMessage,
-    required branch,
-    required flutterVersion,
-    required dartVersion,
+    required String tool,
+    required Directory homeDirectory,
+    required String measurementId,
+    required String apiSecret,
+    required int toolsMessageVersion,
+    required String toolsMessage,
+    required String branch,
+    required String flutterVersion,
+    required String dartVersion,
     bool? forceReset,
   }) =>
       AnalyticsImpl(
@@ -29,6 +30,33 @@ abstract class Analytics {
         branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
+      );
+
+  /// Factory constructor to return the [AnalyticsImpl] class with a
+  /// [MemoryFileSystem] to use for testing
+  factory Analytics.test({
+    required String tool,
+    required Directory homeDirectory,
+    required String measurementId,
+    required String apiSecret,
+    required int toolsMessageVersion,
+    required String toolsMessage,
+    required String branch,
+    required String flutterVersion,
+    required String dartVersion,
+    required FileSystem fs,
+  }) =>
+      AnalyticsImpl(
+        tool: tool,
+        homeDirectory: homeDirectory,
+        measurementId: measurementId,
+        apiSecret: apiSecret,
+        toolsMessageVersion: toolsMessageVersion,
+        toolsMessage: toolsMessage,
+        branch: branch,
+        flutterVersion: flutterVersion,
+        dartVersion: dartVersion,
+        fs: fs,
       );
 
   /// Boolean indicating whether or not telemetry is enabled
@@ -44,15 +72,15 @@ class AnalyticsImpl implements Analytics {
   late bool _showMessage;
 
   AnalyticsImpl({
-    required tool,
-    required homeDirectory,
-    required measurementId,
-    required apiSecret,
-    required toolsMessageVersion,
-    required toolsMessage,
-    required branch,
-    required flutterVersion,
-    required dartVersion,
+    required String tool,
+    required Directory homeDirectory,
+    required String measurementId,
+    required String apiSecret,
+    required int toolsMessageVersion,
+    required String toolsMessage,
+    required String branch,
+    required String flutterVersion,
+    required String dartVersion,
     bool forceReset = false,
     this.fs = const LocalFileSystem(),
   }) {

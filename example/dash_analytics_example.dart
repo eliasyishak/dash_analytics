@@ -29,7 +29,7 @@ final String tool = 'flutter-tools';
 final String measurementId = 'G-N1NXG28J5B';
 final String apiSecret = '4yT8__oER3Cd84dtx6r-_A';
 
-io.Directory getHomeDirectory() {
+Directory getHomeDirectory() {
   String? home;
   Map<String, String> envVars = io.Platform.environment;
 
