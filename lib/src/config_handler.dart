@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
@@ -16,6 +16,7 @@ const String toolPattern =
     r'^([A-Za-z0-9]+-*[A-Za-z0-9]*)=([0-9]{4}-[0-9]{2}-[0-9]{2}),([0-9]+)$';
 
 class ConfigHandler {
+  final FileSystem fs;
   final Directory homeDirectory;
   final File configFile;
   final File clientIdFile;
@@ -24,13 +25,15 @@ class ConfigHandler {
   /// Reporting enabled unless specified by user
   bool telemetryEnabled = true;
 
-  ConfigHandler({required this.homeDirectory})
-      : configFile = File(p.join(
+  ConfigHandler({
+    required this.fs,
+    required this.homeDirectory,
+  })  : configFile = fs.file(p.join(
           homeDirectory.path,
           '.dart-tool',
           'dart-flutter-telemetry.config',
         )),
-        clientIdFile = File(p.join(
+        clientIdFile = fs.file(p.join(
           homeDirectory.path,
           '.dart-tool',
           'CLIENT_ID',
@@ -79,6 +82,32 @@ class ConfigHandler {
         telemetryEnabled = false;
       }
     });
+  }
+
+  /// Responsibe for the creation of the configuration line
+  /// for the tool being passed in by the user and adding a
+  /// [ToolInfo] object
+  void addTool({required String tool}) {
+    // Increment the version number of any existing tools
+    // that already exist in configuration file by using
+    // the [incrementToolVersion] method
+    if (parsedTools.containsKey(tool)) {
+      // TODO: implement method to increment the tool if it
+      //  already exists in the config file
+    }
+
+    // Create the new instance of [ToolInfo] to be added
+    // to the [parsedTools] map
+    final DateTime now = DateTime.now();
+    parsedTools[tool] = ToolInfo(lastRun: now, versionNumber: 1);
+
+    // New string to be appended to the bottom of the configuration file
+    // with a newline character for new tools to be added
+    String newTool = '$tool=$dateStamp,1\n';
+    if (!configFile.readAsStringSync().endsWith('\n')) {
+      newTool = '\n$newTool';
+    }
+    configFile.writeAsStringSync(newTool, mode: FileMode.append);
   }
 }
 

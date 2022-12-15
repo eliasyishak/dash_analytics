@@ -1,10 +1,15 @@
-import 'dart:io';
+import 'dart:io' as io;
+
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 
 import 'package:dash_analytics/dash_analytics.dart';
 
+final FileSystem fs = LocalFileSystem();
+
 final int flutterToolsMessageVersion = 1;
 final String flutterToolsMessage = '''
-The [tool name] uses Google Analytics to report usage and diagnostic data
+Dash related tooling uses Google Analytics to report usage and diagnostic data
 along with package dependencies, and crash reporting to send basic crash
 reports. This data is used to help improve the Dart platform, Flutter framework,
 and related tools.
@@ -26,17 +31,17 @@ final String apiSecret = '4yT8__oER3Cd84dtx6r-_A';
 
 Directory getHomeDirectory() {
   String? home;
-  Map<String, String> envVars = Platform.environment;
+  Map<String, String> envVars = io.Platform.environment;
 
-  if (Platform.isMacOS) {
+  if (io.Platform.isMacOS) {
     home = envVars['HOME'];
-  } else if (Platform.isLinux) {
+  } else if (io.Platform.isLinux) {
     home = envVars['HOME'];
-  } else if (Platform.isWindows) {
+  } else if (io.Platform.isWindows) {
     home = envVars['UserProfile'];
   }
 
-  return Directory(home!);
+  return fs.directory(home!);
 }
 
 // Globally instantiate the analytics class at the entry

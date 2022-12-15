@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
@@ -65,9 +65,6 @@ void createConfigFile({
 # displayed.
 $tool=$dateStamp,$toolsMessageVersion
 ''');
-
-  stdout.writeln('Generated the new config file at ${configFile.path}\n');
-  stdout.writeln(toolsMessage);
 }
 
 /// Creates the session json file which will contain
@@ -84,6 +81,7 @@ createSessionFile({required File sessionFile}) {
 }
 
 class Initializer {
+  final FileSystem fs;
   final String tool;
   final Directory homeDirectory;
   final int toolsMessageVersion;
@@ -104,6 +102,7 @@ class Initializer {
   /// Passing [forceReset] as true will only reset the configuration
   /// file, it won't recreate the client id file
   Initializer({
+    required this.fs,
     required this.tool,
     required this.homeDirectory,
     required this.toolsMessageVersion,
@@ -120,7 +119,7 @@ class Initializer {
   /// If it doesn't exist, one will be created there
   void run() {
     // Begin by checking for the 'dart-flutter-telemetry.config'
-    final File configFile = File(p.join(
+    final File configFile = fs.file(p.join(
         homeDirectory.path, '.dart-tool', 'dart-flutter-telemetry.config'));
 
     // When the config file doesn't exist, initialize it with the default tools
@@ -138,14 +137,14 @@ class Initializer {
 
     // Begin initialization checks for the client id
     final File clientFile =
-        File(p.join(homeDirectory.path, '.dart-tool', 'CLIENT_ID'));
+        fs.file(p.join(homeDirectory.path, '.dart-tool', 'CLIENT_ID'));
     if (!clientFile.existsSync()) {
       createClientIdFile(clientFile: clientFile);
     }
 
     // Begin initialization checks for the session file
     final File sessionFile =
-        File(p.join(homeDirectory.path, '.dart-tool', 'session.json'));
+        fs.file(p.join(homeDirectory.path, '.dart-tool', 'session.json'));
     if (!sessionFile.existsSync()) {
       createSessionFile(sessionFile: sessionFile);
     }
