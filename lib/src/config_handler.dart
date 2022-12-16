@@ -23,7 +23,7 @@ class ConfigHandler {
   final Map<String, ToolInfo> parsedTools = {};
 
   /// Reporting enabled unless specified by user
-  bool telemetryEnabled = true;
+  bool _telemetryEnabled = true;
 
   ConfigHandler({
     required this.fs,
@@ -79,10 +79,14 @@ class ConfigHandler {
     disableTelemetryRegex.allMatches(configString).forEach((element) {
       // Conditional for recording telemetry as being disabled
       if (element.group(1) != ';' && element.group(2) == '0') {
-        telemetryEnabled = false;
+        _telemetryEnabled = false;
       }
     });
   }
+
+  // TODO: determine if we should read from the file every time we
+  //  get the [_telemetryEnabled] field
+  bool get telemetryEnabled => _telemetryEnabled;
 
   /// Responsibe for the creation of the configuration line
   /// for the tool being passed in by the user and adding a
@@ -128,7 +132,7 @@ class ConfigHandler {
 
       configFile.writeAsStringSync(newConfigString);
 
-      telemetryEnabled = reportingBool;
+      _telemetryEnabled = reportingBool;
     }
   }
 }
