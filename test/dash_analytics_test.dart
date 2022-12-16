@@ -91,4 +91,48 @@ void main() {
     expect(configHandler.parsedTools.containsKey(secondTool), true,
         reason: 'The second tool: $secondAnalytics should be in the map');
   });
+
+  test('Toggling telemetry boolean through Analytics class api', () {
+    expect(analytics.telemetryEnabled, true,
+        reason: 'Telemetry should be enabled by default '
+            'when initialized for the first time');
+
+    // Use the API to disable analytics
+    analytics.enableTelemetry(false);
+    expect(analytics.telemetryEnabled, false,
+        reason: 'Analytics telemetry should be disabled');
+
+    // Toggle it back to being enabled
+    analytics.enableTelemetry(true);
+    expect(analytics.telemetryEnabled, true,
+        reason: 'Analytics telemetry should be enabled');
+  });
+
+  test(
+      'Telemetry has been disabled by one '
+      'tool and second tool correctly shows telemetry is disabled', () {
+    // Use the API to disable analytics
+    analytics.enableTelemetry(false);
+    expect(analytics.telemetryEnabled, false,
+        reason: 'Analytics telemetry should be disabled');
+
+    // Initialize a second analytics class, which simulates a second tool
+    // Create a new instance of the analytics class with the new tool
+    final Analytics secondAnalytics = Analytics.test(
+      tool: secondTool,
+      homeDirectory: home,
+      measurementId: 'measurementId',
+      apiSecret: 'apiSecret',
+      toolsMessageVersion: 1,
+      toolsMessage: 'flutterToolsMessage',
+      branch: 'ey-test-branch',
+      flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+      dartVersion: 'Dart 2.19.0',
+      fs: fs,
+    );
+
+    expect(secondAnalytics.telemetryEnabled, false,
+        reason: 'Analytics telemetry should be disabled by the first class '
+            'and the second class should show telemetry is disabled');
+  });
 }
