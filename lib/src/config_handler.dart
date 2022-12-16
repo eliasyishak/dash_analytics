@@ -85,7 +85,10 @@ class ConfigHandler {
   }
 
   // TODO: determine if we should read from the file every time we
-  //  get the [_telemetryEnabled] field
+  //  get the [_telemetryEnabled] field; there is an edge case where
+  //  two analytics classes are running and one disables telemetry, the
+  //  other one will not know telemetry has been disabled until we call
+  //  the [parseConfig()] method again
   bool get telemetryEnabled => _telemetryEnabled;
 
   /// Responsibe for the creation of the configuration line
