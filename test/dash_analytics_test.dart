@@ -135,4 +135,7 @@ void main() {
         reason: 'Analytics telemetry should be disabled by the first class '
             'and the second class should show telemetry is disabled');
   });
+
+  // TODO: add a test to check that the tool is correctly adding a new line
+  //  character at the end of the config file if it was missing one
 }

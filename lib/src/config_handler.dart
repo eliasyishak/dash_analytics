@@ -45,6 +45,13 @@ class ConfigHandler {
     return DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
+  /// Regex pattern implementation for matching a line in the config file
+  ///
+  /// Example:
+  /// flutter-tools=2022-10-26,1
+  static RegExp disableTelemetryRegex =
+      RegExp(disableTelemetryPattern, multiLine: true);
+
   /// Method responsible for reading in the config file stored on
   /// user's machine and parsing out the following: all the tools that
   /// have been logged in the file, the dates they were last run, and
@@ -117,13 +124,13 @@ class ConfigHandler {
     configFile.writeAsStringSync(newTool, mode: FileMode.append);
   }
 
-  /// Disables the reporting capabilities if true is passed
+  /// Disables the reporting capabilities if false is passed
   void enableTelemetry(bool reportingBool) {
     final String flag = reportingBool ? '1' : '0';
     final String configString = configFile.readAsStringSync();
 
-    final RegExp regex = RegExp(disableTelemetryPattern, multiLine: true);
-    final Iterable<RegExpMatch> matches = regex.allMatches(configString);
+    final Iterable<RegExpMatch> matches =
+        disableTelemetryRegex.allMatches(configString);
 
     // TODO: need to determine what to do when there are two lines for the reporting
     //  flag; currently assuming that there will only be one
@@ -131,7 +138,7 @@ class ConfigHandler {
       final String newTelemetryString = 'reporting=$flag';
 
       final String newConfigString =
-          configString.replaceAll(regex, newTelemetryString);
+          configString.replaceAll(disableTelemetryRegex, newTelemetryString);
 
       configFile.writeAsStringSync(newConfigString);
 
