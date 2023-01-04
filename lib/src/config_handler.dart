@@ -107,7 +107,7 @@ class ConfigHandler {
   /// last modified datetime is different from what was parsed when
   /// the class was initialized
   bool get telemetryEnabled {
-    if (configFile.lastModifiedSync() != configFileLastModified) {
+    if (configFileLastModified.isBefore(configFile.lastModifiedSync())) {
       parseConfig();
       configFileLastModified = configFile.lastModifiedSync();
     }
