@@ -21,7 +21,7 @@ class ConfigHandler {
   final File configFile;
   final File clientIdFile;
   final Map<String, ToolInfo> parsedTools = {};
-  late DateTime fileLastModified;
+  late DateTime configFileLastModified;
 
   /// Reporting enabled unless specified by user
   bool _telemetryEnabled = true;
@@ -41,7 +41,7 @@ class ConfigHandler {
         )) {
     // Get the last time the file was updated and check this
     // datestamp whenever the client asks for the telemetry enabled boolean
-    fileLastModified = configFile.lastModifiedSync();
+    configFileLastModified = configFile.lastModifiedSync();
 
     // Call the method to parse the contents of the config file when
     // this class is initialized
@@ -107,9 +107,9 @@ class ConfigHandler {
   /// last modified datetime is different from what was parsed when
   /// the class was initialized
   bool get telemetryEnabled {
-    if (configFile.lastModifiedSync() != fileLastModified) {
+    if (configFile.lastModifiedSync() != configFileLastModified) {
       parseConfig();
-      fileLastModified = configFile.lastModifiedSync();
+      configFileLastModified = configFile.lastModifiedSync();
     }
 
     return _telemetryEnabled;

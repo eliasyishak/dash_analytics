@@ -157,7 +157,7 @@ void main() {
     expect(analytics.telemetryEnabled, true,
         reason: 'Telemetry should be enabled on initialization for '
             'first analytics instance');
-    expect(analytics.telemetryEnabled, true,
+    expect(secondAnalytics.telemetryEnabled, true,
         reason: 'Telemetry should be enabled on initialization for '
             'second analytics instance');
 
@@ -172,6 +172,47 @@ void main() {
             ' by checking the timestamp on the config file');
   });
 
-  // TODO: add a test to check that the tool is correctly adding a new line
-  //  character at the end of the config file if it was missing one
+  test('New line character is added if missing', () {
+    String currentConfigFileString;
+
+    // Access the config handler directly to remove the trailing
+    // new line character
+    configHandler = ConfigHandler(fs: fs, homeDirectory: home);
+
+    expect(configHandler.configFile.readAsStringSync().endsWith('\n'), true,
+        reason: 'When initialized, the tool should correctly '
+            'add a trailing new line character');
+
+    // Remove the trailing new line character before initializing a second
+    // analytics class; the new class should correctly format the config file
+    currentConfigFileString = configHandler.configFile.readAsStringSync();
+    currentConfigFileString = currentConfigFileString.substring(
+        0, currentConfigFileString.length - 1);
+
+    // Write back out to the config file to be processed again
+    configHandler.configFile.writeAsStringSync(currentConfigFileString);
+
+    expect(configHandler.configFile.readAsStringSync().endsWith('\n'), false,
+        reason: 'The trailing new line should be missing');
+
+    // Initialize a second analytics class, which simulates a second tool
+    // which should correct the missing trailing new line character
+    final Analytics secondAnalytics = Analytics.test(
+      tool: secondTool,
+      homeDirectory: home,
+      measurementId: 'measurementId',
+      apiSecret: 'apiSecret',
+      toolsMessageVersion: 1,
+      toolsMessage: 'flutterToolsMessage',
+      branch: 'ey-test-branch',
+      flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+      dartVersion: 'Dart 2.19.0',
+      fs: fs,
+    );
+    expect(secondAnalytics.telemetryEnabled, true);
+
+    expect(configHandler.configFile.readAsStringSync().endsWith('\n'), true,
+        reason: 'The second analytics class will correct '
+            'the missing new line character');
+  });
 }
