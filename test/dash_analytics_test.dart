@@ -111,6 +111,8 @@ void main() {
   test(
       'Telemetry has been disabled by one '
       'tool and second tool correctly shows telemetry is disabled', () {
+    expect(analytics.telemetryEnabled, true,
+        reason: 'Analytics telemetry should be enabled on initialization');
     // Use the API to disable analytics
     analytics.enableTelemetry(false);
     expect(analytics.telemetryEnabled, false,
