@@ -142,7 +142,6 @@ void main() {
       'Two concurrent instances are running '
       'and reflect an accurate up to date telemetry status', () {
     // Initialize a second analytics class, which simulates a second tool
-    // Create a new instance of the analytics class with the new tool
     final Analytics secondAnalytics = Analytics.test(
       tool: secondTool,
       homeDirectory: home,
