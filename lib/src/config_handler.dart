@@ -21,6 +21,7 @@ class ConfigHandler {
   final File configFile;
   final File clientIdFile;
   final Map<String, ToolInfo> parsedTools = {};
+  late DateTime fileLastModified;
 
   /// Reporting enabled unless specified by user
   bool _telemetryEnabled = true;
@@ -38,6 +39,12 @@ class ConfigHandler {
           '.dart-tool',
           'CLIENT_ID',
         )) {
+    // Get the last time the file was updated and check this
+    // datestamp whenever the client asks for the telemetry enabled boolean
+    fileLastModified = configFile.lastModifiedSync();
+
+    // Call the method to parse the contents of the config file when
+    // this class is initialized
     parseConfig();
   }
 
@@ -57,6 +64,9 @@ class ConfigHandler {
   /// have been logged in the file, the dates they were last run, and
   /// determining if telemetry is enabled by parsing the file
   void parseConfig() {
+    // Begin with the assumption that telemetry is always enabled
+    _telemetryEnabled = true;
+
     final RegExp toolRegex = RegExp(toolPattern, multiLine: true);
     final RegExp disableTelemetryRegex =
         RegExp(disableTelemetryPattern, multiLine: true);
@@ -91,12 +101,19 @@ class ConfigHandler {
     });
   }
 
-  // TODO: determine if we should read from the file every time we
-  //  get the [_telemetryEnabled] field; there is an edge case where
-  //  two analytics classes are running and one disables telemetry, the
-  //  other one will not know telemetry has been disabled until we call
-  //  the [parseConfig()] method again
-  bool get telemetryEnabled => _telemetryEnabled;
+  /// Returns the telemetry state from the config file
+  ///
+  /// Method will reparse the config file if it detects that the
+  /// last modified datetime is different from what was parsed when
+  /// the class was initialized
+  bool get telemetryEnabled {
+    if (configFile.lastModifiedSync() != fileLastModified) {
+      parseConfig();
+      fileLastModified = configFile.lastModifiedSync();
+    }
+
+    return _telemetryEnabled;
+  }
 
   /// Responsibe for the creation of the configuration line
   /// for the tool being passed in by the user and adding a

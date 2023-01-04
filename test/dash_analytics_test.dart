@@ -136,6 +136,42 @@ void main() {
             'and the second class should show telemetry is disabled');
   });
 
+  test(
+      'Two concurrent instances are running '
+      'and reflect an accurate up to date telemetry status', () {
+    // Initialize a second analytics class, which simulates a second tool
+    // Create a new instance of the analytics class with the new tool
+    final Analytics secondAnalytics = Analytics.test(
+      tool: secondTool,
+      homeDirectory: home,
+      measurementId: 'measurementId',
+      apiSecret: 'apiSecret',
+      toolsMessageVersion: 1,
+      toolsMessage: 'flutterToolsMessage',
+      branch: 'ey-test-branch',
+      flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+      dartVersion: 'Dart 2.19.0',
+      fs: fs,
+    );
+
+    expect(analytics.telemetryEnabled, true,
+        reason: 'Telemetry should be enabled on initialization for '
+            'first analytics instance');
+    expect(analytics.telemetryEnabled, true,
+        reason: 'Telemetry should be enabled on initialization for '
+            'second analytics instance');
+
+    // Use the API to disable analytics on the first instance
+    analytics.enableTelemetry(false);
+    expect(analytics.telemetryEnabled, false,
+        reason: 'Analytics telemetry should be disabled on first instance');
+
+    expect(secondAnalytics.telemetryEnabled, false,
+        reason: 'Analytics telemetry should be disabled by the first class '
+            'and the second class should show telemetry is disabled'
+            ' by checking the timestamp on the config file');
+  });
+
   // TODO: add a test to check that the tool is correctly adding a new line
   //  character at the end of the config file if it was missing one
 }
