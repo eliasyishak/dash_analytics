@@ -98,6 +98,7 @@ class ConfigHandler {
       newTool = '\n$newTool';
     }
     configFile.writeAsStringSync(newTool, mode: FileMode.append);
+    configFileLastModified = configFile.lastModifiedSync();
   }
 
   /// Disables the reporting capabilities if false is passed
@@ -117,6 +118,7 @@ class ConfigHandler {
           configString.replaceAll(disableTelemetryRegex, newTelemetryString);
 
       configFile.writeAsStringSync(newConfigString);
+      configFileLastModified = configFile.lastModifiedSync();
 
       _telemetryEnabled = reportingBool;
     }
