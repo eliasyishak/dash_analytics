@@ -10,7 +10,6 @@ void main() {
   late Directory home;
   late Directory dartToolDirectory;
   late Analytics analytics;
-  late ConfigHandler configHandler;
 
   const String initialToolName = 'initialTool';
   const String secondTool = 'newTool';
@@ -85,7 +84,8 @@ void main() {
 
     // Access the config handler specifically to check adding a tool was
     // was successful, this class will not be available for importing however
-    configHandler = ConfigHandler(fs: fs, homeDirectory: home);
+    final ConfigHandler configHandler =
+        ConfigHandler(fs: fs, homeDirectory: home);
 
     expect(configHandler.parsedTools.length, equals(2),
         reason: 'There should be only 2 tools that have '
@@ -182,7 +182,8 @@ void main() {
 
     // Access the config handler directly to remove the trailing
     // new line character
-    configHandler = ConfigHandler(fs: fs, homeDirectory: home);
+    final ConfigHandler configHandler =
+        ConfigHandler(fs: fs, homeDirectory: home);
 
     expect(configHandler.configFile.readAsStringSync().endsWith('\n'), true,
         reason: 'When initialized, the tool should correctly '
