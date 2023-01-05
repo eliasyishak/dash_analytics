@@ -16,11 +16,19 @@ const String toolPattern =
     r'^([A-Za-z0-9]+-*[A-Za-z0-9]*)=([0-9]{4}-[0-9]{2}-[0-9]{2}),([0-9]+)$';
 
 class ConfigHandler {
+  /// Regex pattern implementation for matching a line in the config file
+  ///
+  /// Example:
+  /// flutter-tools=2022-10-26,1
+  static RegExp disableTelemetryRegex =
+      RegExp(disableTelemetryPattern, multiLine: true);
+
   final FileSystem fs;
   final Directory homeDirectory;
   final File configFile;
   final File clientIdFile;
   final Map<String, ToolInfo> parsedTools = {};
+
   late DateTime configFileLastModified;
 
   /// Reporting enabled unless specified by user
@@ -50,55 +58,6 @@ class ConfigHandler {
 
   String get dateStamp {
     return DateFormat('yyyy-MM-dd').format(DateTime.now());
-  }
-
-  /// Regex pattern implementation for matching a line in the config file
-  ///
-  /// Example:
-  /// flutter-tools=2022-10-26,1
-  static RegExp disableTelemetryRegex =
-      RegExp(disableTelemetryPattern, multiLine: true);
-
-  /// Method responsible for reading in the config file stored on
-  /// user's machine and parsing out the following: all the tools that
-  /// have been logged in the file, the dates they were last run, and
-  /// determining if telemetry is enabled by parsing the file
-  void parseConfig() {
-    // Begin with the assumption that telemetry is always enabled
-    _telemetryEnabled = true;
-
-    final RegExp toolRegex = RegExp(toolPattern, multiLine: true);
-    final RegExp disableTelemetryRegex =
-        RegExp(disableTelemetryPattern, multiLine: true);
-
-    // Read the configuration file as a string and run the two regex patterns
-    // on it to get information around which tools have been parsed and whether
-    // or not telemetry has been disabled by the user
-    final String configString = configFile.readAsStringSync();
-
-    // Collect the tools logged in the configuration file
-    toolRegex.allMatches(configString).forEach((element) {
-      // Extract the information relevant for the [ToolInfo] class
-      final String tool = element.group(1) as String;
-      final DateTime lastRun = DateTime.parse(element.group(2) as String);
-      final int versionNumber = int.parse(element.group(3) as String);
-
-      // Initialize an instance of the [ToolInfo] class to store
-      // in the [parsedTools] map object
-      parsedTools[tool] = ToolInfo(
-        lastRun: lastRun,
-        versionNumber: versionNumber,
-      );
-    });
-
-    // Check for lines signaling that the user has disabled analytics,
-    // if multiple lines are found, the more conservative value will be used
-    disableTelemetryRegex.allMatches(configString).forEach((element) {
-      // Conditional for recording telemetry as being disabled
-      if (element.group(1) != ';' && element.group(2) == '0') {
-        _telemetryEnabled = false;
-      }
-    });
   }
 
   /// Returns the telemetry state from the config file
@@ -161,6 +120,48 @@ class ConfigHandler {
 
       _telemetryEnabled = reportingBool;
     }
+  }
+
+  /// Method responsible for reading in the config file stored on
+  /// user's machine and parsing out the following: all the tools that
+  /// have been logged in the file, the dates they were last run, and
+  /// determining if telemetry is enabled by parsing the file
+  void parseConfig() {
+    // Begin with the assumption that telemetry is always enabled
+    _telemetryEnabled = true;
+
+    final RegExp toolRegex = RegExp(toolPattern, multiLine: true);
+    final RegExp disableTelemetryRegex =
+        RegExp(disableTelemetryPattern, multiLine: true);
+
+    // Read the configuration file as a string and run the two regex patterns
+    // on it to get information around which tools have been parsed and whether
+    // or not telemetry has been disabled by the user
+    final String configString = configFile.readAsStringSync();
+
+    // Collect the tools logged in the configuration file
+    toolRegex.allMatches(configString).forEach((element) {
+      // Extract the information relevant for the [ToolInfo] class
+      final String tool = element.group(1) as String;
+      final DateTime lastRun = DateTime.parse(element.group(2) as String);
+      final int versionNumber = int.parse(element.group(3) as String);
+
+      // Initialize an instance of the [ToolInfo] class to store
+      // in the [parsedTools] map object
+      parsedTools[tool] = ToolInfo(
+        lastRun: lastRun,
+        versionNumber: versionNumber,
+      );
+    });
+
+    // Check for lines signaling that the user has disabled analytics,
+    // if multiple lines are found, the more conservative value will be used
+    disableTelemetryRegex.allMatches(configString).forEach((element) {
+      // Conditional for recording telemetry as being disabled
+      if (element.group(1) != ';' && element.group(2) == '0') {
+        _telemetryEnabled = false;
+      }
+    });
   }
 }
 
