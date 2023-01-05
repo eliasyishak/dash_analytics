@@ -23,7 +23,7 @@ void main() {
 
   setUp(() {
     // Setup the filesystem with the home directory
-    fs = MemoryFileSystem();
+    fs = MemoryFileSystem.test();
     home = fs.directory('home');
     dartToolDirectory = home.childDirectory('.dart-tool');
 
@@ -102,12 +102,12 @@ void main() {
             'when initialized for the first time');
 
     // Use the API to disable analytics
-    analytics.enableTelemetry(false);
+    analytics.setTelemetry(false);
     expect(analytics.telemetryEnabled, false,
         reason: 'Analytics telemetry should be disabled');
 
     // Toggle it back to being enabled
-    analytics.enableTelemetry(true);
+    analytics.setTelemetry(true);
     expect(analytics.telemetryEnabled, true,
         reason: 'Analytics telemetry should be enabled');
   });
@@ -118,7 +118,7 @@ void main() {
     expect(analytics.telemetryEnabled, true,
         reason: 'Analytics telemetry should be enabled on initialization');
     // Use the API to disable analytics
-    analytics.enableTelemetry(false);
+    analytics.setTelemetry(false);
     expect(analytics.telemetryEnabled, false,
         reason: 'Analytics telemetry should be disabled');
 
@@ -167,7 +167,7 @@ void main() {
             'second analytics instance');
 
     // Use the API to disable analytics on the first instance
-    analytics.enableTelemetry(false);
+    analytics.setTelemetry(false);
     expect(analytics.telemetryEnabled, false,
         reason: 'Analytics telemetry should be disabled on first instance');
 
@@ -221,6 +221,4 @@ void main() {
         reason: 'The second analytics class will correct '
             'the missing new line character');
   });
-
-  // TODO: add test to confirm that the show [shouldShowMessage] works
 }

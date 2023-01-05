@@ -67,7 +67,7 @@ abstract class Analytics {
 
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
-  void enableTelemetry(bool reportingBool);
+  void setTelemetry(bool reportingBool);
 }
 
 class AnalyticsImpl implements Analytics {
@@ -124,7 +124,7 @@ class AnalyticsImpl implements Analytics {
   bool get shouldShowMessage => _showMessage;
 
   @override
-  void enableTelemetry(bool reportingBool) {
-    _configHandler.enableTelemetry(reportingBool);
+  void setTelemetry(bool reportingBool) {
+    _configHandler.setTelemetry(reportingBool);
   }
 }
