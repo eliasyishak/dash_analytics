@@ -101,29 +101,6 @@ class ConfigHandler {
     configFileLastModified = configFile.lastModifiedSync();
   }
 
-  /// Disables the reporting capabilities if false is passed
-  void setTelemetry(bool reportingBool) {
-    final String flag = reportingBool ? '1' : '0';
-    final String configString = configFile.readAsStringSync();
-
-    final Iterable<RegExpMatch> matches =
-        disableTelemetryRegex.allMatches(configString);
-
-    // TODO: need to determine what to do when there are two lines for the reporting
-    //  flag; currently assuming that there will only be one
-    if (matches.length == 1) {
-      final String newTelemetryString = 'reporting=$flag';
-
-      final String newConfigString =
-          configString.replaceAll(disableTelemetryRegex, newTelemetryString);
-
-      configFile.writeAsStringSync(newConfigString);
-      configFileLastModified = configFile.lastModifiedSync();
-
-      _telemetryEnabled = reportingBool;
-    }
-  }
-
   /// Method responsible for reading in the config file stored on
   /// user's machine and parsing out the following: all the tools that
   /// have been logged in the file, the dates they were last run, and
@@ -164,6 +141,29 @@ class ConfigHandler {
         _telemetryEnabled = false;
       }
     });
+  }
+
+  /// Disables the reporting capabilities if false is passed
+  void setTelemetry(bool reportingBool) {
+    final String flag = reportingBool ? '1' : '0';
+    final String configString = configFile.readAsStringSync();
+
+    final Iterable<RegExpMatch> matches =
+        disableTelemetryRegex.allMatches(configString);
+
+    // TODO: need to determine what to do when there are two lines for the reporting
+    //  flag; currently assuming that there will only be one
+    if (matches.length == 1) {
+      final String newTelemetryString = 'reporting=$flag';
+
+      final String newConfigString =
+          configString.replaceAll(disableTelemetryRegex, newTelemetryString);
+
+      configFile.writeAsStringSync(newConfigString);
+      configFileLastModified = configFile.lastModifiedSync();
+
+      _telemetryEnabled = reportingBool;
+    }
   }
 }
 
