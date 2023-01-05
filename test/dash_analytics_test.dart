@@ -42,6 +42,10 @@ void main() {
     );
   });
 
+  tearDown(() {
+    dartToolDirectory.deleteSync(recursive: true);
+  });
+
   test('Initializer properly sets up on first run', () {
     // The 3 files that should have been generated
     final File clientIdFile =
@@ -216,4 +220,6 @@ void main() {
         reason: 'The second analytics class will correct '
             'the missing new line character');
   });
+
+  // TODO: add test to confirm that the show [shouldShowMessage] works
 }
