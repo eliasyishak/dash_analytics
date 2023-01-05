@@ -16,14 +16,23 @@ const String toolPattern =
     r'^([A-Za-z0-9]+-*[A-Za-z0-9]*)=([0-9]{4}-[0-9]{2}-[0-9]{2}),([0-9]+)$';
 
 class ConfigHandler {
+  /// Regex pattern implementation for matching a line in the config file
+  ///
+  /// Example:
+  /// flutter-tools=2022-10-26,1
+  static RegExp disableTelemetryRegex =
+      RegExp(disableTelemetryPattern, multiLine: true);
+
   final FileSystem fs;
   final Directory homeDirectory;
   final File configFile;
   final File clientIdFile;
   final Map<String, ToolInfo> parsedTools = {};
 
+  late DateTime configFileLastModified;
+
   /// Reporting enabled unless specified by user
-  bool telemetryEnabled = true;
+  bool _telemetryEnabled = true;
 
   ConfigHandler({
     required this.fs,
@@ -38,6 +47,12 @@ class ConfigHandler {
           '.dart-tool',
           'CLIENT_ID',
         )) {
+    // Get the last time the file was updated and check this
+    // datestamp whenever the client asks for the telemetry enabled boolean
+    configFileLastModified = configFile.lastModifiedSync();
+
+    // Call the method to parse the contents of the config file when
+    // this class is initialized
     parseConfig();
   }
 
@@ -45,11 +60,55 @@ class ConfigHandler {
     return DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
+  /// Returns the telemetry state from the config file
+  ///
+  /// Method will reparse the config file if it detects that the
+  /// last modified datetime is different from what was parsed when
+  /// the class was initialized
+  bool get telemetryEnabled {
+    if (configFileLastModified.isBefore(configFile.lastModifiedSync())) {
+      parseConfig();
+      configFileLastModified = configFile.lastModifiedSync();
+    }
+
+    return _telemetryEnabled;
+  }
+
+  /// Responsibe for the creation of the configuration line
+  /// for the tool being passed in by the user and adding a
+  /// [ToolInfo] object
+  void addTool({required String tool}) {
+    // Increment the version number of any existing tools
+    // that already exist in configuration file by using
+    // the [incrementToolVersion] method
+    if (parsedTools.containsKey(tool)) {
+      // TODO: implement method to increment the tool if it
+      //  already exists in the config file
+    }
+
+    // Create the new instance of [ToolInfo] to be added
+    // to the [parsedTools] map
+    final DateTime now = DateTime.now();
+    parsedTools[tool] = ToolInfo(lastRun: now, versionNumber: 1);
+
+    // New string to be appended to the bottom of the configuration file
+    // with a newline character for new tools to be added
+    String newTool = '$tool=$dateStamp,1\n';
+    if (!configFile.readAsStringSync().endsWith('\n')) {
+      newTool = '\n$newTool';
+    }
+    configFile.writeAsStringSync(newTool, mode: FileMode.append);
+    configFileLastModified = configFile.lastModifiedSync();
+  }
+
   /// Method responsible for reading in the config file stored on
   /// user's machine and parsing out the following: all the tools that
   /// have been logged in the file, the dates they were last run, and
   /// determining if telemetry is enabled by parsing the file
   void parseConfig() {
+    // Begin with the assumption that telemetry is always enabled
+    _telemetryEnabled = true;
+
     final RegExp toolRegex = RegExp(toolPattern, multiLine: true);
     final RegExp disableTelemetryRegex =
         RegExp(disableTelemetryPattern, multiLine: true);
@@ -79,35 +138,32 @@ class ConfigHandler {
     disableTelemetryRegex.allMatches(configString).forEach((element) {
       // Conditional for recording telemetry as being disabled
       if (element.group(1) != ';' && element.group(2) == '0') {
-        telemetryEnabled = false;
+        _telemetryEnabled = false;
       }
     });
   }
 
-  /// Responsibe for the creation of the configuration line
-  /// for the tool being passed in by the user and adding a
-  /// [ToolInfo] object
-  void addTool({required String tool}) {
-    // Increment the version number of any existing tools
-    // that already exist in configuration file by using
-    // the [incrementToolVersion] method
-    if (parsedTools.containsKey(tool)) {
-      // TODO: implement method to increment the tool if it
-      //  already exists in the config file
-    }
+  /// Disables the reporting capabilities if false is passed
+  void setTelemetry(bool reportingBool) {
+    final String flag = reportingBool ? '1' : '0';
+    final String configString = configFile.readAsStringSync();
 
-    // Create the new instance of [ToolInfo] to be added
-    // to the [parsedTools] map
-    final DateTime now = DateTime.now();
-    parsedTools[tool] = ToolInfo(lastRun: now, versionNumber: 1);
+    final Iterable<RegExpMatch> matches =
+        disableTelemetryRegex.allMatches(configString);
 
-    // New string to be appended to the bottom of the configuration file
-    // with a newline character for new tools to be added
-    String newTool = '$tool=$dateStamp,1\n';
-    if (!configFile.readAsStringSync().endsWith('\n')) {
-      newTool = '\n$newTool';
+    // TODO: need to determine what to do when there are two lines for the reporting
+    //  flag; currently assuming that there will only be one
+    if (matches.length == 1) {
+      final String newTelemetryString = 'reporting=$flag';
+
+      final String newConfigString =
+          configString.replaceAll(disableTelemetryRegex, newTelemetryString);
+
+      configFile.writeAsStringSync(newConfigString);
+      configFileLastModified = configFile.lastModifiedSync();
+
+      _telemetryEnabled = reportingBool;
     }
-    configFile.writeAsStringSync(newTool, mode: FileMode.append);
   }
 }
 
