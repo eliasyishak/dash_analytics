@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
 /// The regex pattern used to parse the disable analytics line
-const String disableTelemetryPattern = r'^(;?)reporting=([0|1]) *$';
+const String telemetryFlagPattern = r'^(;?)reporting=([0|1]) *$';
 
 /// The regex pattern used to parse the tools info
 /// from the configuration file
@@ -20,8 +20,8 @@ class ConfigHandler {
   ///
   /// Example:
   /// flutter-tools=2022-10-26,1
-  static RegExp disableTelemetryRegex =
-      RegExp(disableTelemetryPattern, multiLine: true);
+  static RegExp telemetryFlagRegex =
+      RegExp(telemetryFlagPattern, multiLine: true);
 
   final FileSystem fs;
   final Directory homeDirectory;
@@ -110,8 +110,8 @@ class ConfigHandler {
     _telemetryEnabled = true;
 
     final RegExp toolRegex = RegExp(toolPattern, multiLine: true);
-    final RegExp disableTelemetryRegex =
-        RegExp(disableTelemetryPattern, multiLine: true);
+    final RegExp telemetryFlagRegex =
+        RegExp(telemetryFlagPattern, multiLine: true);
 
     // Read the configuration file as a string and run the two regex patterns
     // on it to get information around which tools have been parsed and whether
@@ -135,7 +135,7 @@ class ConfigHandler {
 
     // Check for lines signaling that the user has disabled analytics,
     // if multiple lines are found, the more conservative value will be used
-    disableTelemetryRegex.allMatches(configString).forEach((element) {
+    telemetryFlagRegex.allMatches(configString).forEach((element) {
       // Conditional for recording telemetry as being disabled
       if (element.group(1) != ';' && element.group(2) == '0') {
         _telemetryEnabled = false;
@@ -149,7 +149,7 @@ class ConfigHandler {
     final String configString = configFile.readAsStringSync();
 
     final Iterable<RegExpMatch> matches =
-        disableTelemetryRegex.allMatches(configString);
+        telemetryFlagRegex.allMatches(configString);
 
     // TODO: need to determine what to do when there are two lines for the reporting
     //  flag; currently assuming that there will only be one
@@ -157,7 +157,7 @@ class ConfigHandler {
       final String newTelemetryString = 'reporting=$flag';
 
       final String newConfigString =
-          configString.replaceAll(disableTelemetryRegex, newTelemetryString);
+          configString.replaceAll(telemetryFlagRegex, newTelemetryString);
 
       configFile.writeAsStringSync(newConfigString);
       configFileLastModified = configFile.lastModifiedSync();
