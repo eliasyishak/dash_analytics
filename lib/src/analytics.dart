@@ -59,6 +59,10 @@ abstract class Analytics {
         fs: fs,
       );
 
+  /// Returns a map object with all of the tools that have been parsed
+  /// out of the configuration file
+  Map<String, ToolInfo> get parsedTools;
+
   /// Boolean that lets the client know if they should display the message
   bool get shouldShowMessage;
 
@@ -118,6 +122,9 @@ class AnalyticsImpl implements Analytics {
       _showMessage = true;
     }
   }
+
+  @override
+  Map<String, ToolInfo> get parsedTools => _configHandler.parsedTools;
 
   @override
   bool get shouldShowMessage => _showMessage;
