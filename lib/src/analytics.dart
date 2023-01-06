@@ -62,6 +62,9 @@ abstract class Analytics {
   /// Boolean indicating whether or not telemetry is enabled
   bool get telemetryEnabled;
 
+  /// Returns the message that should be displayed to the users
+  String get toolsMessage;
+
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
   void setTelemetry(bool reportingBool);
