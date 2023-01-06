@@ -4,6 +4,7 @@ import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
+import 'constants.dart';
 import 'utils/uuid.dart';
 
 /// Creates the text file that will contain the client ID
@@ -25,41 +26,7 @@ void createConfigFile({
 }) {
   configFile.createSync(recursive: true);
   configFile.writeAsStringSync('''
-# INTRODUCTION
-#
-# This is the Flutter and Dart telemetry reporting
-# configuration file.
-#
-# Lines starting with a #" are documentation that
-# the tools maintain automatically.
-#
-# All other lines are configuration lines. They have
-# the form "name=value". If multiple lines contain
-# the same configuration name with different values,
-# the parser will default to a conservative value. 
-
-# DISABLING TELEMETRY REPORTING
-#
-# To disable telemetry reporting, set "reporting" to
-# the value "0" by uncommenting the following line:
-reporting=1
-
-# NOTIFICATIONS
-#
-# Each tool records when it last informed the user about
-# analytics reporting and the privacy policy.
-#
-# The following tools have so far read this file:
-#
-#   dart-tools (Dart CLI developer tool)
-#   devtools (DevTools debugging and performance tools)
-#   flutter-tools (Flutter CLI developer tool)
-#
-# For each one, the file may contain a configuration line
-# where the name is the code in the list above, e.g. "dart-tool",
-# and the value is a date in the form YYYY-MM-DD, a comma, and
-# a number representing the version of the message that was
-# displayed.
+$kConfigString
 $tool=$dateStamp,$toolsMessageVersion
 ''');
 }
@@ -81,8 +48,6 @@ class Initializer {
   final FileSystem fs;
   final String tool;
   final Directory homeDirectory;
-  final int toolsMessageVersion;
-  final String toolsMessage;
   final bool forceReset;
   bool firstRun = false;
 
@@ -102,8 +67,6 @@ class Initializer {
     required this.fs,
     required this.tool,
     required this.homeDirectory,
-    required this.toolsMessageVersion,
-    required this.toolsMessage,
     this.forceReset = false,
   });
 
@@ -127,8 +90,8 @@ class Initializer {
         configFile: configFile,
         dateStamp: dateStamp,
         tool: tool,
-        toolsMessage: toolsMessage,
-        toolsMessageVersion: toolsMessageVersion,
+        toolsMessage: kToolsMessage,
+        toolsMessageVersion: kToolsMessageVersion,
       );
     }
 

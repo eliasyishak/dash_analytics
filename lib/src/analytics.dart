@@ -3,6 +3,7 @@ import 'package:file/local.dart';
 import 'package:file/memory.dart';
 
 import 'config_handler.dart';
+import 'constants.dart';
 import 'initializer.dart';
 
 abstract class Analytics {
@@ -13,8 +14,6 @@ abstract class Analytics {
     required Directory homeDirectory,
     required String measurementId,
     required String apiSecret,
-    required int toolsMessageVersion,
-    required String toolsMessage,
     required String branch,
     required String flutterVersion,
     required String dartVersion,
@@ -25,8 +24,6 @@ abstract class Analytics {
         homeDirectory: homeDirectory,
         measurementId: measurementId,
         apiSecret: apiSecret,
-        toolsMessageVersion: toolsMessageVersion,
-        toolsMessage: toolsMessage,
         branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
@@ -39,8 +36,6 @@ abstract class Analytics {
     required Directory homeDirectory,
     required String measurementId,
     required String apiSecret,
-    required int toolsMessageVersion,
-    required String toolsMessage,
     required String branch,
     required String flutterVersion,
     required String dartVersion,
@@ -51,8 +46,6 @@ abstract class Analytics {
         homeDirectory: homeDirectory,
         measurementId: measurementId,
         apiSecret: apiSecret,
-        toolsMessageVersion: toolsMessageVersion,
-        toolsMessage: toolsMessage,
         branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
@@ -64,6 +57,9 @@ abstract class Analytics {
 
   /// Boolean indicating whether or not telemetry is enabled
   bool get telemetryEnabled;
+
+  /// The message to display to users
+  String get toolsMessage;
 
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
@@ -80,8 +76,6 @@ class AnalyticsImpl implements Analytics {
     required Directory homeDirectory,
     required String measurementId,
     required String apiSecret,
-    required int toolsMessageVersion,
-    required String toolsMessage,
     required String branch,
     required String flutterVersion,
     required String dartVersion,
@@ -95,8 +89,6 @@ class AnalyticsImpl implements Analytics {
       fs: fs,
       tool: tool,
       homeDirectory: homeDirectory,
-      toolsMessageVersion: toolsMessageVersion,
-      toolsMessage: toolsMessage,
       forceReset: forceReset,
     );
     initializer.run();
@@ -119,9 +111,10 @@ class AnalyticsImpl implements Analytics {
   bool get shouldShowMessage => _showMessage;
 
   @override
-  bool get telemetryEnabled {
-    return _configHandler.telemetryEnabled;
-  }
+  bool get telemetryEnabled => _configHandler.telemetryEnabled;
+
+  @override
+  String get toolsMessage => kToolsMessage;
 
   @override
   void setTelemetry(bool reportingBool) {
