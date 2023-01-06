@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
 /// The regex pattern used to parse the disable analytics line
-const String telemetryFlagPattern = r'^(;?)reporting=([0|1]) *$';
+const String telemetryFlagPattern = r'^reporting=([0|1]) *$';
 
 /// The regex pattern used to parse the tools info
 /// from the configuration file
@@ -22,6 +22,7 @@ class ConfigHandler {
   /// flutter-tools=2022-10-26,1
   static RegExp telemetryFlagRegex =
       RegExp(telemetryFlagPattern, multiLine: true);
+  static RegExp toolRegex = RegExp(toolPattern, multiLine: true);
 
   final FileSystem fs;
   final Directory homeDirectory;
@@ -109,10 +110,6 @@ class ConfigHandler {
     // Begin with the assumption that telemetry is always enabled
     _telemetryEnabled = true;
 
-    final RegExp toolRegex = RegExp(toolPattern, multiLine: true);
-    final RegExp telemetryFlagRegex =
-        RegExp(telemetryFlagPattern, multiLine: true);
-
     // Read the configuration file as a string and run the two regex patterns
     // on it to get information around which tools have been parsed and whether
     // or not telemetry has been disabled by the user
@@ -137,7 +134,7 @@ class ConfigHandler {
     // if multiple lines are found, the more conservative value will be used
     telemetryFlagRegex.allMatches(configString).forEach((element) {
       // Conditional for recording telemetry as being disabled
-      if (element.group(1) != ';' && element.group(2) == '0') {
+      if (element.group(1) == '0') {
         _telemetryEnabled = false;
       }
     });

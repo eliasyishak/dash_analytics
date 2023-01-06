@@ -33,9 +33,6 @@ void createConfigFile({
 # Lines starting with a #" are documentation that
 # the tools maintain automatically.
 #
-# Lines starting with a ";" are comments and are
-# ignored by the tools that read this file.
-#
 # All other lines are configuration lines. They have
 # the form "name=value". If multiple lines contain
 # the same configuration name with different values,
@@ -45,7 +42,7 @@ void createConfigFile({
 #
 # To disable telemetry reporting, set "reporting" to
 # the value "0" by uncommenting the following line:
-;reporting=0
+reporting=1
 
 # NOTIFICATIONS
 #
