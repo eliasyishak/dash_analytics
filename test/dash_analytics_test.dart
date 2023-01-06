@@ -222,7 +222,23 @@ void main() {
             'the missing new line character');
   });
 
-  // TODO: create a test to check that the incrementing of tools is successful
+  test('Incrementing the version for a tool is successful', () {
+    // Initialize a second analytics class for the same tool as
+    // the first analytics instance except with a newer version for
+    // the tools message and version
+    final Analytics secondAnalytics = Analytics.test(
+      tool: initialToolName,
+      homeDirectory: home,
+      measurementId: measurementId,
+      apiSecret: apiSecret,
+      branch: branch,
+      toolsMessageVersion: toolsMessageVersion + 1,
+      toolsMessage: toolsMessage,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      fs: fs,
+    );
+  });
 
   // TODO: create a test to check that the config file matches what was written
   //  in the constants file
