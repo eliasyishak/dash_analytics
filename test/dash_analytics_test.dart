@@ -223,6 +223,11 @@ void main() {
   });
 
   test('Incrementing the version for a tool is successful', () {
+    expect(analytics.parsedTools[initialToolName]?.versionNumber,
+        toolsMessageVersion,
+        reason: 'On initialization, the first version number should '
+            'be what is set in the setup method');
+
     // Initialize a second analytics class for the same tool as
     // the first analytics instance except with a newer version for
     // the tools message and version
@@ -238,6 +243,11 @@ void main() {
       dartVersion: dartVersion,
       fs: fs,
     );
+
+    expect(secondAnalytics.parsedTools[initialToolName]?.versionNumber,
+        toolsMessageVersion + 1,
+        reason:
+            'The second analytics instance should have incremented the version');
   });
 
   // TODO: create a test to check that the config file matches what was written
