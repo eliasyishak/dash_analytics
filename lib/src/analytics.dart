@@ -39,6 +39,8 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
+    required int toolsMessageVersion,
+    required String toolsMessage,
     required FileSystem fs,
   }) =>
       AnalyticsImpl(
@@ -47,6 +49,8 @@ abstract class Analytics {
         measurementId: measurementId,
         apiSecret: apiSecret,
         branch: branch,
+        toolsMessageVersion: toolsMessageVersion,
+        toolsMessage: toolsMessage,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
         fs: fs,
@@ -58,9 +62,6 @@ abstract class Analytics {
   /// Boolean indicating whether or not telemetry is enabled
   bool get telemetryEnabled;
 
-  /// The message to display to users
-  String get toolsMessage;
-
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
   void setTelemetry(bool reportingBool);
@@ -68,6 +69,7 @@ abstract class Analytics {
 
 class AnalyticsImpl implements Analytics {
   final FileSystem fs;
+  final String toolsMessage;
   late ConfigHandler _configHandler;
   late bool _showMessage;
 
@@ -79,6 +81,8 @@ class AnalyticsImpl implements Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
+    this.toolsMessage = kToolsMessage,
+    int toolsMessageVersion = kToolsMessageVersion,
     bool forceReset = false,
     this.fs = const LocalFileSystem(),
   }) {
@@ -89,6 +93,8 @@ class AnalyticsImpl implements Analytics {
       fs: fs,
       tool: tool,
       homeDirectory: homeDirectory,
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       forceReset: forceReset,
     );
     initializer.run();
@@ -112,9 +118,6 @@ class AnalyticsImpl implements Analytics {
 
   @override
   bool get telemetryEnabled => _configHandler.telemetryEnabled;
-
-  @override
-  String get toolsMessage => kToolsMessage;
 
   @override
   void setTelemetry(bool reportingBool) {

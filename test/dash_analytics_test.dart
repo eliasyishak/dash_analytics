@@ -33,6 +33,8 @@ void main() {
       measurementId: measurementId,
       apiSecret: apiSecret,
       branch: branch,
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
@@ -73,6 +75,8 @@ void main() {
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -126,6 +130,8 @@ void main() {
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -146,6 +152,8 @@ void main() {
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -201,6 +209,8 @@ void main() {
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -211,4 +221,9 @@ void main() {
         reason: 'The second analytics class will correct '
             'the missing new line character');
   });
+
+  // TODO: create a test to check that the incrementing of tools is successful
+
+  // TODO: create a test to check that the config file matches what was written
+  //  in the constants file
 }

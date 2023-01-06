@@ -48,6 +48,8 @@ class Initializer {
   final FileSystem fs;
   final String tool;
   final Directory homeDirectory;
+  final int toolsMessageVersion;
+  final String toolsMessage;
   final bool forceReset;
   bool firstRun = false;
 
@@ -67,6 +69,8 @@ class Initializer {
     required this.fs,
     required this.tool,
     required this.homeDirectory,
+    required this.toolsMessageVersion,
+    required this.toolsMessage,
     this.forceReset = false,
   });
 
@@ -90,8 +94,8 @@ class Initializer {
         configFile: configFile,
         dateStamp: dateStamp,
         tool: tool,
-        toolsMessage: kToolsMessage,
-        toolsMessageVersion: kToolsMessageVersion,
+        toolsMessage: toolsMessage,
+        toolsMessageVersion: toolsMessageVersion,
       );
     }
 
