@@ -113,15 +113,17 @@ class AnalyticsImpl implements Analytics {
       _configHandler.addTool(tool: tool);
       _showMessage = true;
     }
+    if (_configHandler.parsedTools[tool]!.versionNumber < toolsMessageVersion) {
+      _configHandler.incrementToolVersion(tool: tool);
+      _showMessage = true;
+    }
   }
 
   @override
   bool get shouldShowMessage => _showMessage;
 
   @override
-  bool get telemetryEnabled {
-    return _configHandler.telemetryEnabled;
-  }
+  bool get telemetryEnabled => _configHandler.telemetryEnabled;
 
   @override
   void setTelemetry(bool reportingBool) {

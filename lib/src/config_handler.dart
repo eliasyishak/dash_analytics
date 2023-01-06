@@ -102,6 +102,43 @@ class ConfigHandler {
     configFileLastModified = configFile.lastModifiedSync();
   }
 
+  /// Will increment the version number and update the date
+  /// in the config file for the provided tool name while
+  /// also incrementing the version number in [ToolInfo]
+  void incrementToolVersion({required String tool}) {
+    if (!parsedTools.containsKey(tool)) {
+      return;
+    }
+
+    // Read in the config file contents and use a regex pattern to
+    // match the line for the current tool (ie. flutter-tools=2023-01-05,1)
+    final String configString = configFile.readAsStringSync();
+    final String pattern = '^($tool)=([0-9]{4}-[0-9]{2}-[0-9]{2}),([0-9]+)\$';
+
+    final RegExp regex = RegExp(pattern, multiLine: true);
+    final Iterable<RegExpMatch> matches = regex.allMatches(configString);
+
+    // TODO: need to determine what to do when there are two lines for the same tool
+    //  as outlined in the Dev Notes document; currently only assuming one line per tool
+    if (matches.length == 1) {
+      final RegExpMatch match = matches.first;
+
+      // Extract the groups from the regex match to prep for parsing
+      final int newVersionNumber = int.parse(match.group(3) as String) + 1;
+
+      // Construct the new tool line for the config line and replace it
+      // in the original config string to prep for writing back out
+      final String newToolString = '$tool=$dateStamp,$newVersionNumber';
+      final String newConfigString =
+          configString.replaceAll(regex, newToolString);
+      configFile.writeAsStringSync(newConfigString);
+
+      // Update the [ToolInfo] object for the current tool
+      parsedTools[tool]!.lastRun = DateTime.now();
+      parsedTools[tool]!.versionNumber = newVersionNumber;
+    }
+  }
+
   /// Method responsible for reading in the config file stored on
   /// user's machine and parsing out the following: all the tools that
   /// have been logged in the file, the dates they were last run, and
