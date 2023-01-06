@@ -3,6 +3,7 @@ import 'package:file/local.dart';
 import 'package:file/memory.dart';
 
 import 'config_handler.dart';
+import 'constants.dart';
 import 'initializer.dart';
 
 abstract class Analytics {
@@ -13,8 +14,6 @@ abstract class Analytics {
     required Directory homeDirectory,
     required String measurementId,
     required String apiSecret,
-    required int toolsMessageVersion,
-    required String toolsMessage,
     required String branch,
     required String flutterVersion,
     required String dartVersion,
@@ -25,8 +24,6 @@ abstract class Analytics {
         homeDirectory: homeDirectory,
         measurementId: measurementId,
         apiSecret: apiSecret,
-        toolsMessageVersion: toolsMessageVersion,
-        toolsMessage: toolsMessage,
         branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
@@ -39,11 +36,11 @@ abstract class Analytics {
     required Directory homeDirectory,
     required String measurementId,
     required String apiSecret,
-    required int toolsMessageVersion,
-    required String toolsMessage,
     required String branch,
     required String flutterVersion,
     required String dartVersion,
+    required int toolsMessageVersion,
+    required String toolsMessage,
     required FileSystem fs,
   }) =>
       AnalyticsImpl(
@@ -51,9 +48,9 @@ abstract class Analytics {
         homeDirectory: homeDirectory,
         measurementId: measurementId,
         apiSecret: apiSecret,
+        branch: branch,
         toolsMessageVersion: toolsMessageVersion,
         toolsMessage: toolsMessage,
-        branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
         fs: fs,
@@ -69,6 +66,9 @@ abstract class Analytics {
   /// Boolean indicating whether or not telemetry is enabled
   bool get telemetryEnabled;
 
+  /// Returns the message that should be displayed to the users
+  String get toolsMessage;
+
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
   void setTelemetry(bool reportingBool);
@@ -76,6 +76,7 @@ abstract class Analytics {
 
 class AnalyticsImpl implements Analytics {
   final FileSystem fs;
+  final String toolsMessage;
   late ConfigHandler _configHandler;
   late bool _showMessage;
 
@@ -84,11 +85,11 @@ class AnalyticsImpl implements Analytics {
     required Directory homeDirectory,
     required String measurementId,
     required String apiSecret,
-    required int toolsMessageVersion,
-    required String toolsMessage,
     required String branch,
     required String flutterVersion,
     required String dartVersion,
+    this.toolsMessage = kToolsMessage,
+    int toolsMessageVersion = kToolsMessageVersion,
     bool forceReset = false,
     this.fs = const LocalFileSystem(),
   }) {

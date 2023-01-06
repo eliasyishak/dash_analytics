@@ -52,8 +52,6 @@ final Analytics analytics = Analytics(
   measurementId: measurementId,
   apiSecret:
       apiSecret, // TODO: determine if this can live within the package or remain passed in
-  toolsMessageVersion: flutterToolsMessageVersion,
-  toolsMessage: flutterToolsMessage,
   branch: 'ey-test-branch',
   flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
   dartVersion: 'Dart 2.19.0',

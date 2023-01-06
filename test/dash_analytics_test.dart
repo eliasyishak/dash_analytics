@@ -32,9 +32,9 @@ void main() {
       homeDirectory: home,
       measurementId: measurementId,
       apiSecret: apiSecret,
+      branch: branch,
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
-      branch: branch,
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
@@ -74,9 +74,9 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      toolsMessageVersion: 1,
-      toolsMessage: 'flutterToolsMessage',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -129,9 +129,9 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      toolsMessageVersion: 1,
-      toolsMessage: 'flutterToolsMessage',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -151,9 +151,9 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      toolsMessageVersion: 1,
-      toolsMessage: 'flutterToolsMessage',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -208,9 +208,9 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      toolsMessageVersion: 1,
-      toolsMessage: 'flutterToolsMessage',
       branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
@@ -221,4 +221,25 @@ void main() {
         reason: 'The second analytics class will correct '
             'the missing new line character');
   });
+
+  test('Incrementing the version for a tool is successful', () {
+    // Initialize a second analytics class for the same tool as
+    // the first analytics instance except with a newer version for
+    // the tools message and version
+    final Analytics secondAnalytics = Analytics.test(
+      tool: initialToolName,
+      homeDirectory: home,
+      measurementId: measurementId,
+      apiSecret: apiSecret,
+      branch: branch,
+      toolsMessageVersion: toolsMessageVersion + 1,
+      toolsMessage: toolsMessage,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      fs: fs,
+    );
+  });
+
+  // TODO: create a test to check that the config file matches what was written
+  //  in the constants file
 }
