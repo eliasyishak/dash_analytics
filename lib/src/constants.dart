@@ -37,6 +37,9 @@ reporting=1
 # a number representing the version of the message that was
 # displayed.''';
 
+/// The minimum length for a session
+const int kSessionDurationMinutes = 30;
+
 /// The message that should be shown to the user
 const String kToolsMessage = '''
 Flutter and Dart related tooling uses Google Analytics to report usage and
