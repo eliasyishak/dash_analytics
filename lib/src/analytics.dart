@@ -66,7 +66,8 @@ abstract class Analytics {
   /// Boolean indicating whether or not telemetry is enabled
   bool get telemetryEnabled;
 
-  /// Returns the message that should be displayed to the users
+  /// Returns the message that should be displayed to the users if
+  /// [shouldShowMessage] returns true
   String get toolsMessage;
 
   /// Pass a boolean to either enable or disable telemetry and make
@@ -76,9 +77,11 @@ abstract class Analytics {
 
 class AnalyticsImpl implements Analytics {
   final FileSystem fs;
-  final String toolsMessage;
   late ConfigHandler _configHandler;
   late bool _showMessage;
+
+  @override
+  final String toolsMessage;
 
   AnalyticsImpl({
     required String tool,
