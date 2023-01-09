@@ -79,14 +79,6 @@ class ConfigHandler {
   /// for the tool being passed in by the user and adding a
   /// [ToolInfo] object
   void addTool({required String tool}) {
-    // Increment the version number of any existing tools
-    // that already exist in configuration file by using
-    // the [incrementToolVersion] method
-    if (parsedTools.containsKey(tool)) {
-      incrementToolVersion(tool: tool);
-      return;
-    }
-
     // Create the new instance of [ToolInfo] to be added
     // to the [parsedTools] map
     final DateTime now = DateTime.now();
