@@ -3,13 +3,16 @@ import 'package:file/memory.dart';
 import 'package:test/test.dart';
 
 import 'package:dash_analytics/dash_analytics.dart';
-import 'package:dash_analytics/src/config_handler.dart';
+import 'package:dash_analytics/src/constants.dart';
 
 void main() {
   late FileSystem fs;
   late Directory home;
   late Directory dartToolDirectory;
   late Analytics analytics;
+  late File clientIdFile;
+  late File sessionFile;
+  late File configFile;
 
   const String initialToolName = 'initialTool';
   const String secondTool = 'newTool';
@@ -39,6 +42,13 @@ void main() {
       dartVersion: dartVersion,
       fs: fs,
     );
+
+    // The 3 files that should have been generated
+    clientIdFile = home.childDirectory('.dart-tool').childFile('CLIENT_ID');
+    sessionFile = home.childDirectory('.dart-tool').childFile('session.json');
+    configFile = home
+        .childDirectory('.dart-tool')
+        .childFile('dart-flutter-telemetry.config');
   });
 
   tearDown(() {
@@ -46,15 +56,6 @@ void main() {
   });
 
   test('Initializer properly sets up on first run', () {
-    // The 3 files that should have been generated
-    final File clientIdFile =
-        home.childDirectory('.dart-tool').childFile('CLIENT_ID');
-    final File sessionFile =
-        home.childDirectory('.dart-tool').childFile('session.json');
-    final File configFile = home
-        .childDirectory('.dart-tool')
-        .childFile('dart-flutter-telemetry.config');
-
     expect(clientIdFile.existsSync(), true,
         reason: 'The CLIENT_ID file was not found');
     expect(sessionFile.existsSync(), true,
@@ -82,18 +83,16 @@ void main() {
       fs: fs,
     );
 
-    // Access the config handler specifically to check adding a tool was
-    // was successful, this class will not be available for importing however
-    final ConfigHandler configHandler =
-        ConfigHandler(fs: fs, homeDirectory: home);
-
-    expect(configHandler.parsedTools.length, equals(2),
+    expect(secondAnalytics.parsedTools.length, equals(2),
         reason: 'There should be only 2 tools that have '
             'been parsed into the config file');
-    expect(configHandler.parsedTools.containsKey(initialToolName), true,
+    expect(secondAnalytics.parsedTools.containsKey(initialToolName), true,
         reason: 'The first tool: $initialToolName should be in the map');
-    expect(configHandler.parsedTools.containsKey(secondTool), true,
+    expect(secondAnalytics.parsedTools.containsKey(secondTool), true,
         reason: 'The second tool: $secondAnalytics should be in the map');
+    expect(configFile.readAsStringSync().startsWith(kConfigString), true,
+        reason:
+            'The config file should have the same message from the constants file');
   });
 
   test('Toggling telemetry boolean through Analytics class api', () {
@@ -180,25 +179,20 @@ void main() {
   test('New line character is added if missing', () {
     String currentConfigFileString;
 
-    // Access the config handler directly to remove the trailing
-    // new line character
-    final ConfigHandler configHandler =
-        ConfigHandler(fs: fs, homeDirectory: home);
-
-    expect(configHandler.configFile.readAsStringSync().endsWith('\n'), true,
+    expect(configFile.readAsStringSync().endsWith('\n'), true,
         reason: 'When initialized, the tool should correctly '
             'add a trailing new line character');
 
     // Remove the trailing new line character before initializing a second
     // analytics class; the new class should correctly format the config file
-    currentConfigFileString = configHandler.configFile.readAsStringSync();
+    currentConfigFileString = configFile.readAsStringSync();
     currentConfigFileString = currentConfigFileString.substring(
         0, currentConfigFileString.length - 1);
 
     // Write back out to the config file to be processed again
-    configHandler.configFile.writeAsStringSync(currentConfigFileString);
+    configFile.writeAsStringSync(currentConfigFileString);
 
-    expect(configHandler.configFile.readAsStringSync().endsWith('\n'), false,
+    expect(configFile.readAsStringSync().endsWith('\n'), false,
         reason: 'The trailing new line should be missing');
 
     // Initialize a second analytics class, which simulates a second tool
@@ -217,7 +211,7 @@ void main() {
     );
     expect(secondAnalytics.telemetryEnabled, true);
 
-    expect(configHandler.configFile.readAsStringSync().endsWith('\n'), true,
+    expect(configFile.readAsStringSync().endsWith('\n'), true,
         reason: 'The second analytics class will correct '
             'the missing new line character');
   });
@@ -249,7 +243,4 @@ void main() {
         reason:
             'The second analytics instance should have incremented the version');
   });
-
-  // TODO: create a test to check that the config file matches what was written
-  //  in the constants file
 }

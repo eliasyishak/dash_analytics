@@ -4,6 +4,8 @@ import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:dash_analytics/src/initializer.dart';
+
 /// The regex pattern used to parse the disable analytics line
 const String telemetryFlagPattern = r'^reporting=([0|1]) *$';
 
@@ -26,6 +28,7 @@ class ConfigHandler {
 
   final FileSystem fs;
   final Directory homeDirectory;
+  final Initializer initializer;
   final File configFile;
   final File clientIdFile;
   final Map<String, ToolInfo> parsedTools = {};
@@ -38,6 +41,7 @@ class ConfigHandler {
   ConfigHandler({
     required this.fs,
     required this.homeDirectory,
+    required this.initializer,
   })  : configFile = fs.file(p.join(
           homeDirectory.path,
           '.dart-tool',
@@ -110,25 +114,28 @@ class ConfigHandler {
     final RegExp regex = RegExp(pattern, multiLine: true);
     final Iterable<RegExpMatch> matches = regex.allMatches(configString);
 
-    // TODO: need to determine what to do when there are two lines for the same tool
-    //  as outlined in the Dev Notes document; currently only assuming one line per tool
-    if (matches.length == 1) {
-      final RegExpMatch match = matches.first;
-
-      // Extract the groups from the regex match to prep for parsing
-      final int newVersionNumber = int.parse(match.group(3) as String) + 1;
-
-      // Construct the new tool line for the config line and replace it
-      // in the original config string to prep for writing back out
-      final String newToolString = '$tool=$dateStamp,$newVersionNumber';
-      final String newConfigString =
-          configString.replaceAll(regex, newToolString);
-      configFile.writeAsStringSync(newConfigString);
-
-      // Update the [ToolInfo] object for the current tool
-      parsedTools[tool]!.lastRun = DateTime.now();
-      parsedTools[tool]!.versionNumber = newVersionNumber;
+    // If there isn't exactly one match for the given tool, that suggests the
+    // file has been altered and needs to be reset
+    if (matches.length != 1) {
+      initializer.run(forceReset: true);
+      return;
     }
+
+    final RegExpMatch match = matches.first;
+
+    // Extract the groups from the regex match to prep for parsing
+    final int newVersionNumber = int.parse(match.group(3) as String) + 1;
+
+    // Construct the new tool line for the config line and replace it
+    // in the original config string to prep for writing back out
+    final String newToolString = '$tool=$dateStamp,$newVersionNumber';
+    final String newConfigString =
+        configString.replaceAll(regex, newToolString);
+    configFile.writeAsStringSync(newConfigString);
+
+    // Update the [ToolInfo] object for the current tool
+    parsedTools[tool]!.lastRun = DateTime.now();
+    parsedTools[tool]!.versionNumber = newVersionNumber;
   }
 
   /// Method responsible for reading in the config file stored on
@@ -177,19 +184,22 @@ class ConfigHandler {
     final Iterable<RegExpMatch> matches =
         telemetryFlagRegex.allMatches(configString);
 
-    // TODO: need to determine what to do when there are two lines for the reporting
-    //  flag; currently assuming that there will only be one
-    if (matches.length == 1) {
-      final String newTelemetryString = 'reporting=$flag';
-
-      final String newConfigString =
-          configString.replaceAll(telemetryFlagRegex, newTelemetryString);
-
-      configFile.writeAsStringSync(newConfigString);
-      configFileLastModified = configFile.lastModifiedSync();
-
-      _telemetryEnabled = reportingBool;
+    // If there isn't exactly one match for the reporting flag, that suggests the
+    // file has been altered and needs to be reset
+    if (matches.length != 1) {
+      initializer.run(forceReset: true);
+      return;
     }
+
+    final String newTelemetryString = 'reporting=$flag';
+
+    final String newConfigString =
+        configString.replaceAll(telemetryFlagRegex, newTelemetryString);
+
+    configFile.writeAsStringSync(newConfigString);
+    configFileLastModified = configFile.lastModifiedSync();
+
+    _telemetryEnabled = reportingBool;
   }
 }
 

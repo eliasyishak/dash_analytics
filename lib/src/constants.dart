@@ -58,5 +58,4 @@ reporting=1
 # where the name is the code in the list above, e.g. "dart-tool",
 # and the value is a date in the form YYYY-MM-DD, a comma, and
 # a number representing the version of the message that was
-# displayed.
-''';
+# displayed.''';

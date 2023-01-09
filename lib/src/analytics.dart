@@ -17,7 +17,6 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    bool? forceReset,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -93,7 +92,6 @@ class AnalyticsImpl implements Analytics {
     required String dartVersion,
     this.toolsMessage = kToolsMessage,
     int toolsMessageVersion = kToolsMessageVersion,
-    bool forceReset = false,
     this.fs = const LocalFileSystem(),
   }) {
     // This initializer class will let the instance know
@@ -105,13 +103,16 @@ class AnalyticsImpl implements Analytics {
       homeDirectory: homeDirectory,
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
-      forceReset: forceReset,
     );
     initializer.run();
     _showMessage = initializer.firstRun;
 
     // Create the config handler that will parse the config file
-    _configHandler = ConfigHandler(fs: fs, homeDirectory: homeDirectory);
+    _configHandler = ConfigHandler(
+      fs: fs,
+      homeDirectory: homeDirectory,
+      initializer: initializer,
+    );
 
     // Initialize the config handler class and check if the
     // tool message and version have been updated from what
