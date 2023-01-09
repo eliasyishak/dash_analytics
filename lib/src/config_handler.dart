@@ -26,11 +26,17 @@ class ConfigHandler {
       RegExp(telemetryFlagPattern, multiLine: true);
   static RegExp toolRegex = RegExp(toolPattern, multiLine: true);
 
+  /// Get a string representation of the current date in the following format
+  /// yyyy-MM-dd (2023-01-09)
+  static String get dateStamp {
+    return DateFormat('yyyy-MM-dd').format(DateTime.now());
+  }
+
   final FileSystem fs;
   final Directory homeDirectory;
   final Initializer initializer;
   final File configFile;
-  final File clientIdFile;
+
   final Map<String, ToolInfo> parsedTools = {};
 
   late DateTime configFileLastModified;
@@ -42,15 +48,10 @@ class ConfigHandler {
     required this.fs,
     required this.homeDirectory,
     required this.initializer,
-  })  : configFile = fs.file(p.join(
+  }) : configFile = fs.file(p.join(
           homeDirectory.path,
           '.dart-tool',
           'dart-flutter-telemetry.config',
-        )),
-        clientIdFile = fs.file(p.join(
-          homeDirectory.path,
-          '.dart-tool',
-          'CLIENT_ID',
         )) {
     // Get the last time the file was updated and check this
     // datestamp whenever the client asks for the telemetry enabled boolean
@@ -59,10 +60,6 @@ class ConfigHandler {
     // Call the method to parse the contents of the config file when
     // this class is initialized
     parseConfig();
-  }
-
-  String get dateStamp {
-    return DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   /// Returns the telemetry state from the config file
@@ -117,7 +114,7 @@ class ConfigHandler {
     // If there isn't exactly one match for the given tool, that suggests the
     // file has been altered and needs to be reset
     if (matches.length != 1) {
-      initializer.run(forceReset: true);
+      resetConfig();
       return;
     }
 
@@ -176,6 +173,14 @@ class ConfigHandler {
     });
   }
 
+  /// This will reset the configuration file and clear the
+  /// [parsedTools] map and trigger parsing the config again
+  void resetConfig() {
+    initializer.run(forceReset: true);
+    parsedTools.clear();
+    parseConfig();
+  }
+
   /// Disables the reporting capabilities if false is passed
   void setTelemetry(bool reportingBool) {
     final String flag = reportingBool ? '1' : '0';
@@ -187,7 +192,7 @@ class ConfigHandler {
     // If there isn't exactly one match for the reporting flag, that suggests the
     // file has been altered and needs to be reset
     if (matches.length != 1) {
-      initializer.run(forceReset: true);
+      resetConfig();
       return;
     }
 

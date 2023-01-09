@@ -3,6 +3,7 @@ import 'package:file/memory.dart';
 import 'package:test/test.dart';
 
 import 'package:dash_analytics/dash_analytics.dart';
+import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
 
 void main() {
@@ -242,5 +243,133 @@ void main() {
         toolsMessageVersion + 1,
         reason:
             'The second analytics instance should have incremented the version');
+  });
+
+  test(
+      'Config file resets when there is not exactly one match for the reporting flag',
+      () {
+    // Write to the config file a string that is not formatted correctly
+    // (ie. there is more than one match for the reporting flag)
+    configFile.writeAsStringSync('''
+# INTRODUCTION
+#
+# This is the Flutter and Dart telemetry reporting
+# configuration file.
+#
+# Lines starting with a #" are documentation that
+# the tools maintain automatically.
+#
+# All other lines are configuration lines. They have
+# the form "name=value". If multiple lines contain
+# the same configuration name with different values,
+# the parser will default to a conservative value. 
+
+# DISABLING TELEMETRY REPORTING
+#
+# To disable telemetry reporting, set "reporting" to
+# the value "0" and to enable, set to "1":
+reporting=1
+reporting=1
+
+# NOTIFICATIONS
+#
+# Each tool records when it last informed the user about
+# analytics reporting and the privacy policy.
+#
+# The following tools have so far read this file:
+#
+#   dart-tools (Dart CLI developer tool)
+#   devtools (DevTools debugging and performance tools)
+#   flutter-tools (Flutter CLI developer tool)
+#
+# For each one, the file may contain a configuration line
+# where the name is the code in the list above, e.g. "dart-tool",
+# and the value is a date in the form YYYY-MM-DD, a comma, and
+# a number representing the version of the message that was
+# displayed.''');
+
+    // Disable telemetry which should result in a reset of the config file
+    analytics.setTelemetry(false);
+
+    expect(configFile.readAsStringSync().startsWith(kConfigString), true,
+        reason: 'The tool should have reset the config file '
+            'because it was not formatted correctly');
+  });
+
+  test('Config file resets when there is not exactly one match for the tool',
+      () {
+    // Write to the config file a string that is not formatted correctly
+    // (ie. there is more than one match for the reporting flag)
+    configFile.writeAsStringSync('''
+# INTRODUCTION
+#
+# This is the Flutter and Dart telemetry reporting
+# configuration file.
+#
+# Lines starting with a #" are documentation that
+# the tools maintain automatically.
+#
+# All other lines are configuration lines. They have
+# the form "name=value". If multiple lines contain
+# the same configuration name with different values,
+# the parser will default to a conservative value. 
+
+# DISABLING TELEMETRY REPORTING
+#
+# To disable telemetry reporting, set "reporting" to
+# the value "0" and to enable, set to "1":
+reporting=1
+
+# NOTIFICATIONS
+#
+# Each tool records when it last informed the user about
+# analytics reporting and the privacy policy.
+#
+# The following tools have so far read this file:
+#
+#   dart-tools (Dart CLI developer tool)
+#   devtools (DevTools debugging and performance tools)
+#   flutter-tools (Flutter CLI developer tool)
+#
+# For each one, the file may contain a configuration line
+# where the name is the code in the list above, e.g. "dart-tool",
+# and the value is a date in the form YYYY-MM-DD, a comma, and
+# a number representing the version of the message that was
+# displayed.
+$initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
+$initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
+''');
+
+    // Initialize a second analytics class for the same tool as
+    // the first analytics instance except with a newer version for
+    // the tools message and version
+    //
+    // This second instance should reset the config file when it goes
+    // to increment the version in the file
+    final Analytics secondAnalytics = Analytics.test(
+      tool: initialToolName,
+      homeDirectory: home,
+      measurementId: measurementId,
+      apiSecret: apiSecret,
+      branch: branch,
+      toolsMessageVersion: toolsMessageVersion + 1,
+      toolsMessage: toolsMessage,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      fs: fs,
+    );
+
+    expect(
+      configFile.readAsStringSync().endsWith(
+          '# displayed.\n$initialToolName=${ConfigHandler.dateStamp},${toolsMessageVersion + 1}\n'),
+      true,
+      reason: 'The config file ends with the correctly formatted ending '
+          'after removing the duplicate lines for a given tool',
+    );
+    expect(
+      secondAnalytics.parsedTools[initialToolName]?.versionNumber,
+      toolsMessageVersion + 1,
+      reason: 'The new version should have been incremented',
+    );
   });
 }
