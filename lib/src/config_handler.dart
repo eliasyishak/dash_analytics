@@ -83,8 +83,8 @@ class ConfigHandler {
     // that already exist in configuration file by using
     // the [incrementToolVersion] method
     if (parsedTools.containsKey(tool)) {
-      // TODO: implement method to increment the tool if it
-      //  already exists in the config file
+      incrementToolVersion(tool: tool);
+      return;
     }
 
     // Create the new instance of [ToolInfo] to be added
