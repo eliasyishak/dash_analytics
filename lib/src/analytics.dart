@@ -17,7 +17,6 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    bool? forceReset,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -56,13 +55,18 @@ abstract class Analytics {
         fs: fs,
       );
 
+  /// Returns a map object with all of the tools that have been parsed
+  /// out of the configuration file
+  Map<String, ToolInfo> get parsedTools;
+
   /// Boolean that lets the client know if they should display the message
   bool get shouldShowMessage;
 
   /// Boolean indicating whether or not telemetry is enabled
   bool get telemetryEnabled;
 
-  /// Returns the message that should be displayed to the users
+  /// Returns the message that should be displayed to the users if
+  /// [shouldShowMessage] returns true
   String get toolsMessage;
 
   /// Pass a boolean to either enable or disable telemetry and make
@@ -72,9 +76,11 @@ abstract class Analytics {
 
 class AnalyticsImpl implements Analytics {
   final FileSystem fs;
-  final String toolsMessage;
   late ConfigHandler _configHandler;
   late bool _showMessage;
+
+  @override
+  final String toolsMessage;
 
   AnalyticsImpl({
     required String tool,
@@ -86,7 +92,6 @@ class AnalyticsImpl implements Analytics {
     required String dartVersion,
     this.toolsMessage = kToolsMessage,
     int toolsMessageVersion = kToolsMessageVersion,
-    bool forceReset = false,
     this.fs = const LocalFileSystem(),
   }) {
     // This initializer class will let the instance know
@@ -98,13 +103,16 @@ class AnalyticsImpl implements Analytics {
       homeDirectory: homeDirectory,
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
-      forceReset: forceReset,
     );
     initializer.run();
     _showMessage = initializer.firstRun;
 
     // Create the config handler that will parse the config file
-    _configHandler = ConfigHandler(fs: fs, homeDirectory: homeDirectory);
+    _configHandler = ConfigHandler(
+      fs: fs,
+      homeDirectory: homeDirectory,
+      initializer: initializer,
+    );
 
     // Initialize the config handler class and check if the
     // tool message and version have been updated from what
@@ -114,7 +122,14 @@ class AnalyticsImpl implements Analytics {
       _configHandler.addTool(tool: tool);
       _showMessage = true;
     }
+    if (_configHandler.parsedTools[tool]!.versionNumber < toolsMessageVersion) {
+      _configHandler.incrementToolVersion(tool: tool);
+      _showMessage = true;
+    }
   }
+
+  @override
+  Map<String, ToolInfo> get parsedTools => _configHandler.parsedTools;
 
   @override
   bool get shouldShowMessage => _showMessage;

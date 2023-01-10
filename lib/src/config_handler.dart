@@ -4,6 +4,8 @@ import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:dash_analytics/src/initializer.dart';
+
 /// The regex pattern used to parse the disable analytics line
 const String telemetryFlagPattern = r'^reporting=([0|1]) *$';
 
@@ -24,10 +26,17 @@ class ConfigHandler {
       RegExp(telemetryFlagPattern, multiLine: true);
   static RegExp toolRegex = RegExp(toolPattern, multiLine: true);
 
+  /// Get a string representation of the current date in the following format
+  /// yyyy-MM-dd (2023-01-09)
+  static String get dateStamp {
+    return DateFormat('yyyy-MM-dd').format(DateTime.now());
+  }
+
   final FileSystem fs;
   final Directory homeDirectory;
+  final Initializer initializer;
   final File configFile;
-  final File clientIdFile;
+
   final Map<String, ToolInfo> parsedTools = {};
 
   late DateTime configFileLastModified;
@@ -38,15 +47,11 @@ class ConfigHandler {
   ConfigHandler({
     required this.fs,
     required this.homeDirectory,
-  })  : configFile = fs.file(p.join(
+    required this.initializer,
+  }) : configFile = fs.file(p.join(
           homeDirectory.path,
           '.dart-tool',
           'dart-flutter-telemetry.config',
-        )),
-        clientIdFile = fs.file(p.join(
-          homeDirectory.path,
-          '.dart-tool',
-          'CLIENT_ID',
         )) {
     // Get the last time the file was updated and check this
     // datestamp whenever the client asks for the telemetry enabled boolean
@@ -55,10 +60,6 @@ class ConfigHandler {
     // Call the method to parse the contents of the config file when
     // this class is initialized
     parseConfig();
-  }
-
-  String get dateStamp {
-    return DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   /// Returns the telemetry state from the config file
@@ -79,14 +80,6 @@ class ConfigHandler {
   /// for the tool being passed in by the user and adding a
   /// [ToolInfo] object
   void addTool({required String tool}) {
-    // Increment the version number of any existing tools
-    // that already exist in configuration file by using
-    // the [incrementToolVersion] method
-    if (parsedTools.containsKey(tool)) {
-      // TODO: implement method to increment the tool if it
-      //  already exists in the config file
-    }
-
     // Create the new instance of [ToolInfo] to be added
     // to the [parsedTools] map
     final DateTime now = DateTime.now();
@@ -100,6 +93,46 @@ class ConfigHandler {
     }
     configFile.writeAsStringSync(newTool, mode: FileMode.append);
     configFileLastModified = configFile.lastModifiedSync();
+  }
+
+  /// Will increment the version number and update the date
+  /// in the config file for the provided tool name while
+  /// also incrementing the version number in [ToolInfo]
+  void incrementToolVersion({required String tool}) {
+    if (!parsedTools.containsKey(tool)) {
+      return;
+    }
+
+    // Read in the config file contents and use a regex pattern to
+    // match the line for the current tool (ie. flutter-tools=2023-01-05,1)
+    final String configString = configFile.readAsStringSync();
+    final String pattern = '^($tool)=([0-9]{4}-[0-9]{2}-[0-9]{2}),([0-9]+)\$';
+
+    final RegExp regex = RegExp(pattern, multiLine: true);
+    final Iterable<RegExpMatch> matches = regex.allMatches(configString);
+
+    // If there isn't exactly one match for the given tool, that suggests the
+    // file has been altered and needs to be reset
+    if (matches.length != 1) {
+      resetConfig();
+      return;
+    }
+
+    final RegExpMatch match = matches.first;
+
+    // Extract the groups from the regex match to prep for parsing
+    final int newVersionNumber = int.parse(match.group(3) as String) + 1;
+
+    // Construct the new tool line for the config line and replace it
+    // in the original config string to prep for writing back out
+    final String newToolString = '$tool=$dateStamp,$newVersionNumber';
+    final String newConfigString =
+        configString.replaceAll(regex, newToolString);
+    configFile.writeAsStringSync(newConfigString);
+
+    // Update the [ToolInfo] object for the current tool
+    parsedTools[tool]!.lastRun = DateTime.now();
+    parsedTools[tool]!.versionNumber = newVersionNumber;
   }
 
   /// Method responsible for reading in the config file stored on
@@ -140,6 +173,14 @@ class ConfigHandler {
     });
   }
 
+  /// This will reset the configuration file and clear the
+  /// [parsedTools] map and trigger parsing the config again
+  void resetConfig() {
+    initializer.run(forceReset: true);
+    parsedTools.clear();
+    parseConfig();
+  }
+
   /// Disables the reporting capabilities if false is passed
   void setTelemetry(bool reportingBool) {
     final String flag = reportingBool ? '1' : '0';
@@ -148,19 +189,22 @@ class ConfigHandler {
     final Iterable<RegExpMatch> matches =
         telemetryFlagRegex.allMatches(configString);
 
-    // TODO: need to determine what to do when there are two lines for the reporting
-    //  flag; currently assuming that there will only be one
-    if (matches.length == 1) {
-      final String newTelemetryString = 'reporting=$flag';
-
-      final String newConfigString =
-          configString.replaceAll(telemetryFlagRegex, newTelemetryString);
-
-      configFile.writeAsStringSync(newConfigString);
-      configFileLastModified = configFile.lastModifiedSync();
-
-      _telemetryEnabled = reportingBool;
+    // If there isn't exactly one match for the reporting flag, that suggests the
+    // file has been altered and needs to be reset
+    if (matches.length != 1) {
+      resetConfig();
+      return;
     }
+
+    final String newTelemetryString = 'reporting=$flag';
+
+    final String newConfigString =
+        configString.replaceAll(telemetryFlagRegex, newTelemetryString);
+
+    configFile.writeAsStringSync(newConfigString);
+    configFileLastModified = configFile.lastModifiedSync();
+
+    _telemetryEnabled = reportingBool;
   }
 }
 

@@ -50,7 +50,6 @@ class Initializer {
   final Directory homeDirectory;
   final int toolsMessageVersion;
   final String toolsMessage;
-  final bool forceReset;
   bool firstRun = false;
 
   /// Responsibe for the initialization of the files
@@ -62,16 +61,12 @@ class Initializer {
   ///
   /// Updating of the config file with new versions will
   /// not be handled by the [Initializer]
-  ///
-  /// Passing [forceReset] as true will only reset the configuration
-  /// file, it won't recreate the client id file
   Initializer({
     required this.fs,
     required this.tool,
     required this.homeDirectory,
     required this.toolsMessageVersion,
     required this.toolsMessage,
-    this.forceReset = false,
   });
 
   String get dateStamp {
@@ -81,7 +76,10 @@ class Initializer {
   /// This will check that there is a client ID populated in
   /// the user's home directory under the .dart-tool directory.
   /// If it doesn't exist, one will be created there
-  void run() {
+  ///
+  /// Passing [forceReset] as true will only reset the configuration
+  /// file, it won't recreate the client id and session files
+  void run({bool forceReset = false}) {
     // Begin by checking for the 'dart-flutter-telemetry.config'
     final File configFile = fs.file(p.join(
         homeDirectory.path, '.dart-tool', 'dart-flutter-telemetry.config'));

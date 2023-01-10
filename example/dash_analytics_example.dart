@@ -7,21 +7,6 @@ import 'package:dash_analytics/dash_analytics.dart';
 
 final FileSystem fs = LocalFileSystem();
 
-final int flutterToolsMessageVersion = 1;
-final String flutterToolsMessage = '''
-Dash related tooling uses Google Analytics to report usage and diagnostic data
-along with package dependencies, and crash reporting to send basic crash
-reports. This data is used to help improve the Dart platform, Flutter framework,
-and related tools.
-
-Telemetry is not sent on the very first run.
-To disable reporting of telemetry, run this terminal command:
-
-[dart|flutter] --disable-telemetry.
-If you opt out of telemetry, an opt-out event will be sent, and then no further
-information will be sent. This data is collected in accordance with the
-Google Privacy Policy (https://policies.google.com/privacy).
-''';
 final String tool = 'flutter-tools';
 
 // TODO: look into filtering out requests coming into GA4 around conditionals
