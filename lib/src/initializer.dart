@@ -1,48 +1,12 @@
 import 'dart:convert';
 
+import 'package:clock/clock.dart';
 import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
 import 'constants.dart';
 import 'utils/uuid.dart';
-
-/// Creates the text file that will contain the client ID
-/// which will be used across all related tools for analytics
-/// reporting in GA
-void createClientIdFile({required File clientFile}) {
-  clientFile.createSync(recursive: true);
-  clientFile.writeAsStringSync(Uuid().generateV4());
-}
-
-/// Creates the configuration file with the default message
-/// in the user's home directory
-void createConfigFile({
-  required File configFile,
-  required String dateStamp,
-  required String tool,
-  required String toolsMessage,
-  required int toolsMessageVersion,
-}) {
-  configFile.createSync(recursive: true);
-  configFile.writeAsStringSync('''
-$kConfigString
-$tool=$dateStamp,$toolsMessageVersion
-''');
-}
-
-/// Creates the session json file which will contain
-/// the current session id along with the timestamp for
-/// the last ping which will be used to increment the session
-/// if current timestamp is greater than the session window
-createSessionFile({required File sessionFile}) {
-  final DateTime now = DateTime.now();
-  sessionFile.createSync(recursive: true);
-  sessionFile.writeAsStringSync(jsonEncode({
-    'session_id': now.millisecondsSinceEpoch,
-    'last_ping': now.millisecondsSinceEpoch,
-  }));
-}
 
 class Initializer {
   final FileSystem fs;
@@ -69,8 +33,47 @@ class Initializer {
     required this.toolsMessage,
   });
 
+  /// Get a string representation of the current date in the following format
+  /// yyyy-MM-dd (2023-01-09)
   String get dateStamp {
-    return DateFormat('yyyy-MM-dd').format(DateTime.now());
+    return DateFormat('yyyy-MM-dd').format(clock.now());
+  }
+
+  /// Creates the text file that will contain the client ID
+  /// which will be used across all related tools for analytics
+  /// reporting in GA
+  void createClientIdFile({required File clientFile}) {
+    clientFile.createSync(recursive: true);
+    clientFile.writeAsStringSync(Uuid().generateV4());
+  }
+
+  /// Creates the configuration file with the default message
+  /// in the user's home directory
+  void createConfigFile({
+    required File configFile,
+    required String dateStamp,
+    required String tool,
+    required String toolsMessage,
+    required int toolsMessageVersion,
+  }) {
+    configFile.createSync(recursive: true);
+    configFile.writeAsStringSync('''
+$kConfigString
+$tool=$dateStamp,$toolsMessageVersion
+''');
+  }
+
+  /// Creates the session json file which will contain
+  /// the current session id along with the timestamp for
+  /// the last ping which will be used to increment the session
+  /// if current timestamp is greater than the session window
+  createSessionFile({required File sessionFile}) {
+    final DateTime now = clock.now();
+    sessionFile.createSync(recursive: true);
+    sessionFile.writeAsStringSync(jsonEncode({
+      'session_id': now.millisecondsSinceEpoch,
+      'last_ping': now.millisecondsSinceEpoch,
+    }));
   }
 
   /// This will check that there is a client ID populated in

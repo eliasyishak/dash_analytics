@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:clock/clock.dart';
 import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
@@ -82,8 +83,7 @@ class ConfigHandler {
   void addTool({required String tool}) {
     // Create the new instance of [ToolInfo] to be added
     // to the [parsedTools] map
-    final DateTime now = DateTime.now();
-    parsedTools[tool] = ToolInfo(lastRun: now, versionNumber: 1);
+    parsedTools[tool] = ToolInfo(lastRun: clock.now(), versionNumber: 1);
 
     // New string to be appended to the bottom of the configuration file
     // with a newline character for new tools to be added
