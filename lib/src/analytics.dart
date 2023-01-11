@@ -26,6 +26,9 @@ abstract class Analytics {
         branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
+        toolsMessage: kToolsMessage,
+        toolsMessageVersion: kToolsMessageVersion,
+        fs: LocalFileSystem(),
       );
 
   /// Factory constructor to return the [AnalyticsImpl] class with a
@@ -90,9 +93,9 @@ class AnalyticsImpl implements Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    this.toolsMessage = kToolsMessage,
-    int toolsMessageVersion = kToolsMessageVersion,
-    this.fs = const LocalFileSystem(),
+    required this.toolsMessage,
+    required int toolsMessageVersion,
+    required this.fs,
   }) {
     // This initializer class will let the instance know
     // if it was the first run; if it is, nothing will be sent
