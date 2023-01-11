@@ -5,8 +5,8 @@ import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:dash_analytics/src/constants.dart';
-import 'package:dash_analytics/src/initializer.dart';
+import 'constants.dart';
+import 'initializer.dart';
 
 /// The regex pattern used to parse the disable analytics line
 const String telemetryFlagPattern = r'^reporting=([0|1]) *$';

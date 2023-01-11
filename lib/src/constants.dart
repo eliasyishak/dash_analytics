@@ -1,3 +1,6 @@
+/// URL endpoint for sending Google Analytics Events
+const String kAnalyticsUrl = 'https://www.google-analytics.com/mp/collect';
+
 /// Name for the text file that will contain the
 /// user's randomly generated client id
 const String kClientIdFileName = 'CLIENT_ID';

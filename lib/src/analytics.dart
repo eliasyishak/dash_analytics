@@ -1,9 +1,11 @@
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:file/memory.dart';
+import 'package:path/path.dart' as p;
 
 import 'config_handler.dart';
 import 'constants.dart';
+import 'ga_client.dart';
 import 'initializer.dart';
 
 abstract class Analytics {
@@ -58,6 +60,9 @@ abstract class Analytics {
         fs: fs,
       );
 
+  /// Returns the client id from the file
+  String get clientId;
+
   /// Returns a map object with all of the tools that have been parsed
   /// out of the configuration file
   Map<String, ToolInfo> get parsedTools;
@@ -72,6 +77,15 @@ abstract class Analytics {
   /// [shouldShowMessage] returns true
   String get toolsMessage;
 
+  /// Call this method when the tool using this package is closed
+  ///
+  /// Prevents the tool from hanging when if there are still requests
+  /// that need to be sent off
+  void close();
+
+  /// API to send events to Google Analytics to track usage
+  void sendEvent();
+
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
   void setTelemetry(bool reportingBool);
@@ -79,8 +93,10 @@ abstract class Analytics {
 
 class AnalyticsImpl implements Analytics {
   final FileSystem fs;
-  late ConfigHandler _configHandler;
+  late final ConfigHandler _configHandler;
   late bool _showMessage;
+  late final GAClient _gaClient;
+  late final String _clientId;
 
   @override
   final String toolsMessage;
@@ -129,7 +145,21 @@ class AnalyticsImpl implements Analytics {
       _configHandler.incrementToolVersion(tool: tool);
       _showMessage = true;
     }
+    _clientId = fs
+        .file(p.join(
+            homeDirectory.path, kDartToolDirectoryName, kClientIdFileName))
+        .readAsStringSync();
+
+    // Create the instance of the GA Client which will create
+    // an [http.Client] to send requests
+    _gaClient = GAClient(
+      measurementId: measurementId,
+      apiSecret: apiSecret,
+    );
   }
+
+  @override
+  String get clientId => _clientId;
 
   @override
   Map<String, ToolInfo> get parsedTools => _configHandler.parsedTools;
@@ -139,6 +169,14 @@ class AnalyticsImpl implements Analytics {
 
   @override
   bool get telemetryEnabled => _configHandler.telemetryEnabled;
+
+  @override
+  void close() => _gaClient.close();
+
+  @override
+  void sendEvent() {
+    if (!telemetryEnabled) return;
+  }
 
   @override
   void setTelemetry(bool reportingBool) {
