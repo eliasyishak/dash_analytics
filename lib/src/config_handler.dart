@@ -5,6 +5,7 @@ import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:dash_analytics/src/constants.dart';
 import 'package:dash_analytics/src/initializer.dart';
 
 /// The regex pattern used to parse the disable analytics line
@@ -51,8 +52,8 @@ class ConfigHandler {
     required this.initializer,
   }) : configFile = fs.file(p.join(
           homeDirectory.path,
-          '.dart-tool',
-          'dart-flutter-telemetry.config',
+          kDartToolDirectoryName,
+          kConfigFileName,
         )) {
     // Get the last time the file was updated and check this
     // datestamp whenever the client asks for the telemetry enabled boolean

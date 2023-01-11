@@ -1,3 +1,10 @@
+/// Name for the text file that will contain the
+/// user's randomly generated client id
+const String kClientIdFileName = 'CLIENT_ID';
+
+/// Name for the file where telemetry status and tools data will be stored
+const String kConfigFileName = 'dart-flutter-telemetry.config';
+
 /// The string that will provide the boilerplate for the
 /// configuration file stored on the user's machine
 const String kConfigString = '''
@@ -37,8 +44,15 @@ reporting=1
 # a number representing the version of the message that was
 # displayed.''';
 
+/// Name of the directory where all of the files necessary
+/// for this package will be located
+const String kDartToolDirectoryName = '.dart-tool';
+
 /// The minimum length for a session
 const int kSessionDurationMinutes = 30;
+
+/// Name for the json file where the session details will be stored
+const String kSessionFileName = 'session.json';
 
 /// The message that should be shown to the user
 const String kToolsMessage = '''

@@ -29,7 +29,7 @@ void main() {
     // Setup the filesystem with the home directory
     fs = MemoryFileSystem.test();
     home = fs.directory('home');
-    dartToolDirectory = home.childDirectory('.dart-tool');
+    dartToolDirectory = home.childDirectory(kDartToolDirectoryName);
 
     analytics = Analytics.test(
       tool: initialToolName,
@@ -45,11 +45,13 @@ void main() {
     );
 
     // The 3 files that should have been generated
-    clientIdFile = home.childDirectory('.dart-tool').childFile('CLIENT_ID');
-    sessionFile = home.childDirectory('.dart-tool').childFile('session.json');
-    configFile = home
-        .childDirectory('.dart-tool')
-        .childFile('dart-flutter-telemetry.config');
+    clientIdFile = home
+        .childDirectory(kDartToolDirectoryName)
+        .childFile(kClientIdFileName);
+    sessionFile =
+        home.childDirectory(kDartToolDirectoryName).childFile(kSessionFileName);
+    configFile =
+        home.childDirectory(kDartToolDirectoryName).childFile(kConfigFileName);
   });
 
   tearDown(() {
@@ -58,13 +60,14 @@ void main() {
 
   test('Initializer properly sets up on first run', () {
     expect(clientIdFile.existsSync(), true,
-        reason: 'The CLIENT_ID file was not found');
+        reason: 'The $kClientIdFileName file was not found');
     expect(sessionFile.existsSync(), true,
-        reason: 'The session.json file was not found');
+        reason: 'The $kSessionFileName file was not found');
     expect(configFile.existsSync(), true,
-        reason: 'The dart-flutter-telemetry.config was not found');
+        reason: 'The $kConfigFileName was not found');
     expect(dartToolDirectory.listSync().length, equals(3),
-        reason: 'There should only be 3 files in the .dart-tool directory');
+        reason:
+            'There should only be 3 files in the $kDartToolDirectoryName directory');
     expect(analytics.shouldShowMessage, true,
         reason: 'For the first run, analytics should default to being enabled');
   });

@@ -77,15 +77,15 @@ $tool=$dateStamp,$toolsMessageVersion
   }
 
   /// This will check that there is a client ID populated in
-  /// the user's home directory under the .dart-tool directory.
+  /// the user's home directory under the dart-tool directory.
   /// If it doesn't exist, one will be created there
   ///
   /// Passing [forceReset] as true will only reset the configuration
   /// file, it won't recreate the client id and session files
   void run({bool forceReset = false}) {
-    // Begin by checking for the 'dart-flutter-telemetry.config'
-    final File configFile = fs.file(p.join(
-        homeDirectory.path, '.dart-tool', 'dart-flutter-telemetry.config'));
+    // Begin by checking for the config file
+    final File configFile = fs.file(
+        p.join(homeDirectory.path, kDartToolDirectoryName, kConfigFileName));
 
     // When the config file doesn't exist, initialize it with the default tools
     // and the current date
@@ -101,15 +101,15 @@ $tool=$dateStamp,$toolsMessageVersion
     }
 
     // Begin initialization checks for the client id
-    final File clientFile =
-        fs.file(p.join(homeDirectory.path, '.dart-tool', 'CLIENT_ID'));
+    final File clientFile = fs.file(
+        p.join(homeDirectory.path, kDartToolDirectoryName, kClientIdFileName));
     if (!clientFile.existsSync()) {
       createClientIdFile(clientFile: clientFile);
     }
 
     // Begin initialization checks for the session file
-    final File sessionFile =
-        fs.file(p.join(homeDirectory.path, '.dart-tool', 'session.json'));
+    final File sessionFile = fs.file(
+        p.join(homeDirectory.path, kDartToolDirectoryName, kSessionFileName));
     if (!sessionFile.existsSync()) {
       createSessionFile(sessionFile: sessionFile);
     }
