@@ -15,6 +15,7 @@ void main() {
   late File sessionFile;
   late File configFile;
 
+  const String homeDirName = 'home';
   const String initialToolName = 'initialTool';
   const String secondTool = 'newTool';
   const String measurementId = 'measurementId';
@@ -24,11 +25,12 @@ void main() {
   const String branch = 'branch';
   const String flutterVersion = 'flutterVersion';
   const String dartVersion = 'dartVersion';
+  const String platform = 'macos';
 
   setUp(() {
     // Setup the filesystem with the home directory
     fs = MemoryFileSystem.test();
-    home = fs.directory('home');
+    home = fs.directory(homeDirName);
     dartToolDirectory = home.childDirectory(kDartToolDirectoryName);
 
     analytics = Analytics.test(
@@ -42,6 +44,7 @@ void main() {
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     // The 3 files that should have been generated
@@ -85,6 +88,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.parsedTools.length, equals(2),
@@ -138,6 +142,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.telemetryEnabled, false,
@@ -160,6 +165,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(analytics.telemetryEnabled, true,
@@ -212,6 +218,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
     expect(secondAnalytics.telemetryEnabled, true);
 
@@ -240,6 +247,7 @@ void main() {
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.parsedTools[initialToolName]?.versionNumber,
@@ -360,6 +368,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     expect(

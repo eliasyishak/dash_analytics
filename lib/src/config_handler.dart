@@ -31,7 +31,7 @@ class ConfigHandler {
   /// Get a string representation of the current date in the following format
   /// yyyy-MM-dd (2023-01-09)
   static String get dateStamp {
-    return DateFormat('yyyy-MM-dd').format(DateTime.now());
+    return DateFormat('yyyy-MM-dd').format(clock.now());
   }
 
   final FileSystem fs;
@@ -132,7 +132,7 @@ class ConfigHandler {
     configFile.writeAsStringSync(newConfigString);
 
     // Update the [ToolInfo] object for the current tool
-    parsedTools[tool]!.lastRun = DateTime.now();
+    parsedTools[tool]!.lastRun = clock.now();
     parsedTools[tool]!.versionNumber = newVersionNumber;
   }
 

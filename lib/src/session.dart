@@ -6,9 +6,6 @@ import 'package:path/path.dart' as p;
 
 import 'constants.dart';
 
-// TODO: create a method to disable updating the session file
-//  for some tools (like analyzer) that run in the background
-//  for long periods of time
 class Session {
   final Directory homeDirectory;
   final FileSystem fs;
@@ -44,7 +41,7 @@ class Session {
     _refreshSessionData();
     final DateTime now = clock.now();
 
-    // Convert the epoch tiem from the last ping into datetime and
+    // Convert the epoch time from the last ping into datetime and
     // check if we are within the [sessionDurationMinutes]
     final DateTime lastPingDateTime =
         DateTime.fromMillisecondsSinceEpoch(_lastPing);

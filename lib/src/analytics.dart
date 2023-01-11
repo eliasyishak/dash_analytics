@@ -7,6 +7,8 @@ import 'config_handler.dart';
 import 'constants.dart';
 import 'ga_client.dart';
 import 'initializer.dart';
+import 'session.dart';
+import 'user_property.dart';
 
 abstract class Analytics {
   /// The default factory constructor that will return an implementation
@@ -19,6 +21,7 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
+    required String platform,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -28,6 +31,7 @@ abstract class Analytics {
         branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
+        platform: platform,
         toolsMessage: kToolsMessage,
         toolsMessageVersion: kToolsMessageVersion,
         fs: LocalFileSystem(),
@@ -46,6 +50,7 @@ abstract class Analytics {
     required int toolsMessageVersion,
     required String toolsMessage,
     required FileSystem fs,
+    required String platform,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -57,11 +62,9 @@ abstract class Analytics {
         toolsMessage: toolsMessage,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
+        platform: platform,
         fs: fs,
       );
-
-  /// Returns the client id from the file
-  String get clientId;
 
   /// Returns a map object with all of the tools that have been parsed
   /// out of the configuration file
@@ -84,7 +87,10 @@ abstract class Analytics {
   void close();
 
   /// API to send events to Google Analytics to track usage
-  void sendEvent();
+  void sendEvent({
+    required String eventName,
+    required Map eventData,
+  });
 
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
@@ -97,6 +103,7 @@ class AnalyticsImpl implements Analytics {
   late bool _showMessage;
   late final GAClient _gaClient;
   late final String _clientId;
+  late final UserProperty userProperty;
 
   @override
   final String toolsMessage;
@@ -109,6 +116,7 @@ class AnalyticsImpl implements Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
+    required String platform,
     required this.toolsMessage,
     required int toolsMessageVersion,
     required this.fs,
@@ -156,10 +164,20 @@ class AnalyticsImpl implements Analytics {
       measurementId: measurementId,
       apiSecret: apiSecret,
     );
-  }
 
-  @override
-  String get clientId => _clientId;
+    // Initialize the user property class that will be attached to
+    // each event that is sent to Google Analytics -- it will be responsible
+    // for getting the session id or rolling the session if the duration
+    // exceeds [kSessionDurationMinutes]
+    userProperty = UserProperty(
+      session: Session(homeDirectory: homeDirectory, fs: fs),
+      branch: branch,
+      host: platform,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      tool: tool,
+    );
+  }
 
   @override
   Map<String, ToolInfo> get parsedTools => _configHandler.parsedTools;
@@ -174,8 +192,26 @@ class AnalyticsImpl implements Analytics {
   void close() => _gaClient.close();
 
   @override
-  void sendEvent() {
+  void sendEvent({
+    required String eventName,
+    required Map eventData,
+  }) {
     if (!telemetryEnabled) return;
+
+    // Construct the body of the request
+    final Map body = {
+      'client_id': _clientId,
+      'events': [
+        {
+          'name': eventName,
+          'params': eventData,
+        }
+      ],
+      'user_properties': userProperty.preparePayload()
+    };
+
+    // Pass to the google analytics client to send
+    _gaClient.sendData(body);
   }
 
   @override
