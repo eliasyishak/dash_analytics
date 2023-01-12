@@ -15,6 +15,7 @@ void main() {
   late File sessionFile;
   late File configFile;
 
+  const String homeDirName = 'home';
   const String initialToolName = 'initialTool';
   const String secondTool = 'newTool';
   const String measurementId = 'measurementId';
@@ -24,12 +25,13 @@ void main() {
   const String branch = 'branch';
   const String flutterVersion = 'flutterVersion';
   const String dartVersion = 'dartVersion';
+  const String platform = 'macos';
 
   setUp(() {
     // Setup the filesystem with the home directory
     fs = MemoryFileSystem.test();
-    home = fs.directory('home');
-    dartToolDirectory = home.childDirectory('.dart-tool');
+    home = fs.directory(homeDirName);
+    dartToolDirectory = home.childDirectory(kDartToolDirectoryName);
 
     analytics = Analytics.test(
       tool: initialToolName,
@@ -42,14 +44,17 @@ void main() {
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     // The 3 files that should have been generated
-    clientIdFile = home.childDirectory('.dart-tool').childFile('CLIENT_ID');
-    sessionFile = home.childDirectory('.dart-tool').childFile('session.json');
-    configFile = home
-        .childDirectory('.dart-tool')
-        .childFile('dart-flutter-telemetry.config');
+    clientIdFile = home
+        .childDirectory(kDartToolDirectoryName)
+        .childFile(kClientIdFileName);
+    sessionFile =
+        home.childDirectory(kDartToolDirectoryName).childFile(kSessionFileName);
+    configFile =
+        home.childDirectory(kDartToolDirectoryName).childFile(kConfigFileName);
   });
 
   tearDown(() {
@@ -58,13 +63,14 @@ void main() {
 
   test('Initializer properly sets up on first run', () {
     expect(clientIdFile.existsSync(), true,
-        reason: 'The CLIENT_ID file was not found');
+        reason: 'The $kClientIdFileName file was not found');
     expect(sessionFile.existsSync(), true,
-        reason: 'The session.json file was not found');
+        reason: 'The $kSessionFileName file was not found');
     expect(configFile.existsSync(), true,
-        reason: 'The dart-flutter-telemetry.config was not found');
+        reason: 'The $kConfigFileName was not found');
     expect(dartToolDirectory.listSync().length, equals(3),
-        reason: 'There should only be 3 files in the .dart-tool directory');
+        reason:
+            'There should only be 3 files in the $kDartToolDirectoryName directory');
     expect(analytics.shouldShowMessage, true,
         reason: 'For the first run, analytics should default to being enabled');
   });
@@ -82,6 +88,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.parsedTools.length, equals(2),
@@ -135,6 +142,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.telemetryEnabled, false,
@@ -157,6 +165,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(analytics.telemetryEnabled, true,
@@ -209,6 +218,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
     expect(secondAnalytics.telemetryEnabled, true);
 
@@ -237,6 +247,7 @@ void main() {
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.parsedTools[initialToolName]?.versionNumber,
@@ -357,6 +368,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     expect(

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:clock/clock.dart';
 import 'package:file/file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:dash_analytics/src/initializer.dart';
+import 'constants.dart';
+import 'initializer.dart';
 
 /// The regex pattern used to parse the disable analytics line
 const String telemetryFlagPattern = r'^reporting=([0|1]) *$';
@@ -29,7 +31,7 @@ class ConfigHandler {
   /// Get a string representation of the current date in the following format
   /// yyyy-MM-dd (2023-01-09)
   static String get dateStamp {
-    return DateFormat('yyyy-MM-dd').format(DateTime.now());
+    return DateFormat('yyyy-MM-dd').format(clock.now());
   }
 
   final FileSystem fs;
@@ -50,8 +52,8 @@ class ConfigHandler {
     required this.initializer,
   }) : configFile = fs.file(p.join(
           homeDirectory.path,
-          '.dart-tool',
-          'dart-flutter-telemetry.config',
+          kDartToolDirectoryName,
+          kConfigFileName,
         )) {
     // Get the last time the file was updated and check this
     // datestamp whenever the client asks for the telemetry enabled boolean
@@ -82,8 +84,7 @@ class ConfigHandler {
   void addTool({required String tool}) {
     // Create the new instance of [ToolInfo] to be added
     // to the [parsedTools] map
-    final DateTime now = DateTime.now();
-    parsedTools[tool] = ToolInfo(lastRun: now, versionNumber: 1);
+    parsedTools[tool] = ToolInfo(lastRun: clock.now(), versionNumber: 1);
 
     // New string to be appended to the bottom of the configuration file
     // with a newline character for new tools to be added
@@ -131,7 +132,7 @@ class ConfigHandler {
     configFile.writeAsStringSync(newConfigString);
 
     // Update the [ToolInfo] object for the current tool
-    parsedTools[tool]!.lastRun = DateTime.now();
+    parsedTools[tool]!.lastRun = clock.now();
     parsedTools[tool]!.versionNumber = newVersionNumber;
   }
 

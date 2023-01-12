@@ -1,10 +1,14 @@
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:file/memory.dart';
+import 'package:path/path.dart' as p;
 
 import 'config_handler.dart';
 import 'constants.dart';
+import 'ga_client.dart';
 import 'initializer.dart';
+import 'session.dart';
+import 'user_property.dart';
 
 abstract class Analytics {
   /// The default factory constructor that will return an implementation
@@ -17,6 +21,7 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
+    required String platform,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -26,6 +31,10 @@ abstract class Analytics {
         branch: branch,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
+        platform: platform,
+        toolsMessage: kToolsMessage,
+        toolsMessageVersion: kToolsMessageVersion,
+        fs: const LocalFileSystem(),
       );
 
   /// Factory constructor to return the [AnalyticsImpl] class with a
@@ -41,6 +50,7 @@ abstract class Analytics {
     required int toolsMessageVersion,
     required String toolsMessage,
     required FileSystem fs,
+    required String platform,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -52,6 +62,7 @@ abstract class Analytics {
         toolsMessage: toolsMessage,
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
+        platform: platform,
         fs: fs,
       );
 
@@ -69,6 +80,18 @@ abstract class Analytics {
   /// [shouldShowMessage] returns true
   String get toolsMessage;
 
+  /// Call this method when the tool using this package is closed
+  ///
+  /// Prevents the tool from hanging when if there are still requests
+  /// that need to be sent off
+  void close();
+
+  /// API to send events to Google Analytics to track usage
+  void sendEvent({
+    required String eventName,
+    required Map eventData,
+  });
+
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
   void setTelemetry(bool reportingBool);
@@ -76,8 +99,11 @@ abstract class Analytics {
 
 class AnalyticsImpl implements Analytics {
   final FileSystem fs;
-  late ConfigHandler _configHandler;
+  late final ConfigHandler _configHandler;
   late bool _showMessage;
+  late final GAClient _gaClient;
+  late final String _clientId;
+  late final UserProperty userProperty;
 
   @override
   final String toolsMessage;
@@ -90,9 +116,10 @@ class AnalyticsImpl implements Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    this.toolsMessage = kToolsMessage,
-    int toolsMessageVersion = kToolsMessageVersion,
-    this.fs = const LocalFileSystem(),
+    required String platform,
+    required this.toolsMessage,
+    required int toolsMessageVersion,
+    required this.fs,
   }) {
     // This initializer class will let the instance know
     // if it was the first run; if it is, nothing will be sent
@@ -126,6 +153,30 @@ class AnalyticsImpl implements Analytics {
       _configHandler.incrementToolVersion(tool: tool);
       _showMessage = true;
     }
+    _clientId = fs
+        .file(p.join(
+            homeDirectory.path, kDartToolDirectoryName, kClientIdFileName))
+        .readAsStringSync();
+
+    // Create the instance of the GA Client which will create
+    // an [http.Client] to send requests
+    _gaClient = GAClient(
+      measurementId: measurementId,
+      apiSecret: apiSecret,
+    );
+
+    // Initialize the user property class that will be attached to
+    // each event that is sent to Google Analytics -- it will be responsible
+    // for getting the session id or rolling the session if the duration
+    // exceeds [kSessionDurationMinutes]
+    userProperty = UserProperty(
+      session: Session(homeDirectory: homeDirectory, fs: fs),
+      branch: branch,
+      host: platform,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      tool: tool,
+    );
   }
 
   @override
@@ -136,6 +187,32 @@ class AnalyticsImpl implements Analytics {
 
   @override
   bool get telemetryEnabled => _configHandler.telemetryEnabled;
+
+  @override
+  void close() => _gaClient.close();
+
+  @override
+  void sendEvent({
+    required String eventName,
+    required Map eventData,
+  }) {
+    if (!telemetryEnabled) return;
+
+    // Construct the body of the request
+    final Map body = {
+      'client_id': _clientId,
+      'events': [
+        {
+          'name': eventName,
+          'params': eventData,
+        }
+      ],
+      'user_properties': userProperty.preparePayload()
+    };
+
+    // Pass to the google analytics client to send
+    _gaClient.sendData(body);
+  }
 
   @override
   void setTelemetry(bool reportingBool) {

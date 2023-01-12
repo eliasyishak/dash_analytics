@@ -9,8 +9,6 @@ final FileSystem fs = LocalFileSystem();
 
 final String tool = 'flutter-tools';
 
-// TODO: look into filtering out requests coming into GA4 around conditionals
-//  found within the body of the request
 final String measurementId = 'G-N1NXG28J5B';
 final String apiSecret = '4yT8__oER3Cd84dtx6r-_A';
 
@@ -40,6 +38,7 @@ final Analytics analytics = Analytics(
   branch: 'ey-test-branch',
   flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
   dartVersion: 'Dart 2.19.0',
+  platform: 'macos',
 );
 
 void main() async {
@@ -47,6 +46,11 @@ void main() async {
   print('###### START ###### $start');
 
   print(analytics.telemetryEnabled);
+  analytics.sendEvent(
+    eventName: 'testing_from_dash',
+    eventData: {'time_ns': 345},
+  );
+  analytics.close();
 
   DateTime end = DateTime.now();
   print(
