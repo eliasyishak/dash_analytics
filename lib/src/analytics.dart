@@ -34,7 +34,7 @@ abstract class Analytics {
         platform: platform,
         toolsMessage: kToolsMessage,
         toolsMessageVersion: kToolsMessageVersion,
-        fs: LocalFileSystem(),
+        fs: const LocalFileSystem(),
       );
 
   /// Factory constructor to return the [AnalyticsImpl] class with a
