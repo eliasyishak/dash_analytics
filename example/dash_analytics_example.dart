@@ -4,7 +4,6 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 
 import 'package:dash_analytics/dash_analytics.dart';
-import 'package:dash_analytics/src/enums.dart';
 
 final FileSystem fs = LocalFileSystem();
 
