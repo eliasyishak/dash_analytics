@@ -52,7 +52,7 @@ abstract class Analytics {
     required FileSystem fs,
     required String platform,
   }) =>
-      AnalyticsImpl(
+      TestAnalytics(
         tool: tool,
         homeDirectory: homeDirectory,
         measurementId: measurementId,
@@ -218,4 +218,26 @@ class AnalyticsImpl implements Analytics {
   void setTelemetry(bool reportingBool) {
     _configHandler.setTelemetry(reportingBool);
   }
+}
+
+class TestAnalytics extends AnalyticsImpl {
+  TestAnalytics({
+    required super.tool,
+    required super.homeDirectory,
+    required super.measurementId,
+    required super.apiSecret,
+    required super.branch,
+    required super.flutterVersion,
+    required super.dartVersion,
+    required super.platform,
+    required super.toolsMessage,
+    required super.toolsMessageVersion,
+    required super.fs,
+  });
+
+  @override
+  void sendEvent({
+    required String eventName,
+    required Map eventData,
+  }) {}
 }
