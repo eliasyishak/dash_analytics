@@ -448,7 +448,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(sessionObj['session_id'], start.millisecondsSinceEpoch);
+      expect(secondAnalytics.userPropertyMap['session_id']['value'],
+          start.millisecondsSinceEpoch);
       expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
     });
 
@@ -484,7 +485,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(sessionObj['session_id'], start.millisecondsSinceEpoch,
+      expect(thirdAnalytics.userPropertyMap['session_id']['value'],
+          start.millisecondsSinceEpoch,
           reason: 'The session id should not have changed since it was made '
               'within the duration');
       expect(sessionObj['last_ping'], end.millisecondsSinceEpoch,
@@ -524,7 +526,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(sessionObj['session_id'], start.millisecondsSinceEpoch);
+      expect(secondAnalytics.userPropertyMap['session_id']['value'],
+          start.millisecondsSinceEpoch);
       expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
     });
 
@@ -560,7 +563,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(sessionObj['session_id'], end.millisecondsSinceEpoch,
+      expect(thirdAnalytics.userPropertyMap['session_id']['value'],
+          end.millisecondsSinceEpoch,
           reason: 'The session id should have changed since it was made '
               'outside the duration');
       expect(sessionObj['last_ping'], end.millisecondsSinceEpoch,
