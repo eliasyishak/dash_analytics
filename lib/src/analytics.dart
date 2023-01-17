@@ -94,7 +94,7 @@ abstract class Analytics {
 
   /// API to send events to Google Analytics to track usage
   void sendEvent({
-    required String eventName,
+    required DashEvents eventName,
     required Map eventData,
   });
 
@@ -202,7 +202,7 @@ class AnalyticsImpl implements Analytics {
 
   @override
   void sendEvent({
-    required String eventName,
+    required DashEvents eventName,
     required Map eventData,
   }) {
     if (!telemetryEnabled) return;
@@ -246,7 +246,7 @@ class TestAnalytics extends AnalyticsImpl {
 
   @override
   void sendEvent({
-    required String eventName,
+    required DashEvents eventName,
     required Map eventData,
   }) {
     // Calling the prepare payload method will ensure that the

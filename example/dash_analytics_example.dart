@@ -34,8 +34,7 @@ final Analytics analytics = Analytics(
   tool: tool,
   homeDirectory: getHomeDirectory(),
   measurementId: measurementId,
-  apiSecret:
-      apiSecret, // TODO: determine if this can live within the package or remain passed in
+  apiSecret: apiSecret,
   branch: 'ey-test-branch',
   flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
   dartVersion: 'Dart 2.19.0',
@@ -48,7 +47,7 @@ void main() async {
 
   print(analytics.telemetryEnabled);
   analytics.sendEvent(
-    eventName: 'testing_from_dash',
+    eventName: DashEvents.hotReloadTime,
     eventData: {'time_ns': 345},
   );
   analytics.close();

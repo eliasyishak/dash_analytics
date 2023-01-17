@@ -480,7 +480,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       // Calling the send event method will result in the session file
       // getting updated but because we use the `Analytics.test()` constructor
       // no events will be sent
-      thirdAnalytics.sendEvent(eventName: 'eventName', eventData: {});
+      thirdAnalytics
+          .sendEvent(eventName: DashEvents.hotReloadTime, eventData: {});
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
@@ -558,7 +559,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       // Calling the send event method will result in the session file
       // getting updated but because we use the `Analytics.test()` constructor
       // no events will be sent
-      thirdAnalytics.sendEvent(eventName: 'eventName', eventData: {});
+      thirdAnalytics
+          .sendEvent(eventName: DashEvents.hotReloadTime, eventData: {});
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
@@ -571,5 +573,13 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       expect(sessionObj['last_ping'], end.millisecondsSinceEpoch,
           reason: 'The last_ping value should have been updated');
     });
+  });
+
+  test('Validate the available enum types for DevicePlatform', () {
+    expect(DevicePlatforms.values.length, 3,
+        reason: 'There should only be 3 supported device platforms');
+    expect(DevicePlatforms.values.contains(DevicePlatforms.windows), true);
+    expect(DevicePlatforms.values.contains(DevicePlatforms.macos), true);
+    expect(DevicePlatforms.values.contains(DevicePlatforms.linux), true);
   });
 }
