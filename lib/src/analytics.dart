@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 
 import 'config_handler.dart';
 import 'constants.dart';
+import 'enums.dart';
 import 'ga_client.dart';
 import 'initializer.dart';
 import 'session.dart';
@@ -21,7 +22,7 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    required String platform,
+    required DevicePlatforms platform,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -50,7 +51,7 @@ abstract class Analytics {
     required int toolsMessageVersion,
     required String toolsMessage,
     required FileSystem fs,
-    required String platform,
+    required DevicePlatforms platform,
   }) =>
       TestAnalytics(
         tool: tool,
@@ -121,7 +122,7 @@ class AnalyticsImpl implements Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    required String platform,
+    required DevicePlatforms platform,
     required this.toolsMessage,
     required int toolsMessageVersion,
     required this.fs,
@@ -177,7 +178,7 @@ class AnalyticsImpl implements Analytics {
     userProperty = UserProperty(
       session: Session(homeDirectory: homeDirectory, fs: fs),
       branch: branch,
-      host: platform,
+      host: platform.label,
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       tool: tool,

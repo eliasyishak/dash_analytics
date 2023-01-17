@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
+import 'package:dash_analytics/src/enums.dart';
 
 void main() {
   late FileSystem fs;
@@ -28,7 +29,7 @@ void main() {
   const String branch = 'branch';
   const String flutterVersion = 'flutterVersion';
   const String dartVersion = 'dartVersion';
-  const String platform = 'macos';
+  const DevicePlatforms platform = DevicePlatforms.macos;
 
   setUp(() {
     // Setup the filesystem with the home directory

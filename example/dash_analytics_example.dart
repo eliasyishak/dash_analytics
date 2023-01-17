@@ -4,6 +4,7 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 
 import 'package:dash_analytics/dash_analytics.dart';
+import 'package:dash_analytics/src/enums.dart';
 
 final FileSystem fs = LocalFileSystem();
 
@@ -38,7 +39,7 @@ final Analytics analytics = Analytics(
   branch: 'ey-test-branch',
   flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
   dartVersion: 'Dart 2.19.0',
-  platform: 'macos',
+  platform: DevicePlatforms.macos,
 );
 
 void main() async {
