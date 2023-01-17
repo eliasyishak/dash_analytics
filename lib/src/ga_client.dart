@@ -22,6 +22,25 @@ class GAClient {
 
   /// Receive the payload in Map form and parse
   /// into JSON to send to GA
+  ///
+  /// Follows the following schema
+  ///
+  /// ```
+  /// {
+  /// "client_id": "x",
+  /// "events": [
+  ///   {
+  ///     "name": "offline_purchase",
+  ///     "params": {
+  ///       "engagement_time_msec": "100",
+  ///       "session_id": "123"
+  ///     }
+  ///   }
+  /// ]
+  /// }
+  ///
+  /// https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag
+  /// ```
   Future<http.Response> sendData(Map body) {
     return _client.post(
       Uri.parse(postUrl),
