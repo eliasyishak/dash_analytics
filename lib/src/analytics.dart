@@ -80,6 +80,11 @@ abstract class Analytics {
   /// [shouldShowMessage] returns true
   String get toolsMessage;
 
+  /// Returns a map representation of the [UserProperty] for the [Analytics] instance
+  ///
+  /// This is what will get sent to Google Analytics with every request
+  Map get userPropertyMap;
+
   /// Call this method when the tool using this package is closed
   ///
   /// Prevents the tool from hanging when if there are still requests
@@ -189,6 +194,9 @@ class AnalyticsImpl implements Analytics {
   bool get telemetryEnabled => _configHandler.telemetryEnabled;
 
   @override
+  Map get userPropertyMap => userProperty.preparePayload();
+
+  @override
   void close() => _gaClient.close();
 
   @override
@@ -239,5 +247,10 @@ class TestAnalytics extends AnalyticsImpl {
   void sendEvent({
     required String eventName,
     required Map eventData,
-  }) {}
+  }) {
+    // Calling the prepare payload method will ensure that the
+    // session file is getting updated without actually making any
+    // POST requests to Google Analytics
+    userProperty.preparePayload();
+  }
 }
