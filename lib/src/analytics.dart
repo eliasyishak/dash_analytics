@@ -213,7 +213,7 @@ class AnalyticsImpl implements Analytics {
       'client_id': _clientId,
       'events': <Map<String, dynamic>>[
         <String, dynamic>{
-          'name': eventName,
+          'name': eventName.label,
           'params': eventData,
         }
       ],
