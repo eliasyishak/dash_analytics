@@ -1,3 +1,7 @@
+// Copyright 2023 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 /// Values for the event name to be sent to Google Analytics
 ///
 /// The [label] for each enum value is what will be logged, the [desc]
