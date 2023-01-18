@@ -95,7 +95,7 @@ abstract class Analytics {
   /// API to send events to Google Analytics to track usage
   void sendEvent({
     required DashEvents eventName,
-    required Map eventData,
+    required Map<String, dynamic> eventData,
   });
 
   /// Pass a boolean to either enable or disable telemetry and make
@@ -204,15 +204,15 @@ class AnalyticsImpl implements Analytics {
   @override
   void sendEvent({
     required DashEvents eventName,
-    required Map eventData,
+    required Map<String, dynamic> eventData,
   }) {
     if (!telemetryEnabled) return;
 
     // Construct the body of the request
-    final Map body = {
+    final Map<String, dynamic> body = <String, dynamic>{
       'client_id': _clientId,
-      'events': [
-        {
+      'events': <Map<String, dynamic>>[
+        <String, dynamic>{
           'name': eventName,
           'params': eventData,
         }
@@ -248,7 +248,7 @@ class TestAnalytics extends AnalyticsImpl {
   @override
   void sendEvent({
     required DashEvents eventName,
-    required Map eventData,
+    required Map<String, dynamic> eventData,
   }) {
     // Calling the prepare payload method will ensure that the
     // session file is getting updated without actually making any

@@ -67,10 +67,10 @@ $tool=$dateStamp,$toolsMessageVersion
   /// the current session id along with the timestamp for
   /// the last ping which will be used to increment the session
   /// if current timestamp is greater than the session window
-  createSessionFile({required File sessionFile}) {
+  void createSessionFile({required File sessionFile}) {
     final DateTime now = clock.now();
     sessionFile.createSync(recursive: true);
-    sessionFile.writeAsStringSync(jsonEncode({
+    sessionFile.writeAsStringSync(jsonEncode(<String, int>{
       'session_id': now.millisecondsSinceEpoch,
       'last_ping': now.millisecondsSinceEpoch,
     }));

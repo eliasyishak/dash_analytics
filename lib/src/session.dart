@@ -21,10 +21,7 @@ class Session {
     required this.fs,
   }) : _sessionFile = fs.file(p.join(
             homeDirectory.path, kDartToolDirectoryName, kSessionFileName)) {
-    final String sessionFileContents = _sessionFile.readAsStringSync();
-    final Map sessionObj = jsonDecode(sessionFileContents);
-    _sessionId = sessionObj['session_id'];
-    _lastPing = sessionObj['last_ping'];
+    _refreshSessionData();
   }
 
   /// This will use the data parsed from the
@@ -62,7 +59,7 @@ class Session {
   }
 
   /// Return a json formatted representation of the class
-  String toJson() => jsonEncode({
+  String toJson() => jsonEncode(<String, int>{
         'session_id': _sessionId,
         'last_ping': _lastPing,
       });
@@ -76,9 +73,8 @@ class Session {
   /// making updates to the session file
   void _refreshSessionData() {
     final String sessionFileContents = _sessionFile.readAsStringSync();
-    final Map sessionObj = jsonDecode(sessionFileContents);
-
-    _lastPing = sessionObj['last_ping'];
-    _sessionId = sessionObj['session_id'];
+    final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+    _sessionId = sessionObj['session_id'] as int;
+    _lastPing = sessionObj['last_ping'] as int;
   }
 }

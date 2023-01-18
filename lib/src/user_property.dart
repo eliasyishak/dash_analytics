@@ -26,17 +26,15 @@ class UserProperty {
 
   /// Convert the data stored in this class into a map while also
   /// getting the latest session id using the [Session] class
-  Map _toMap() {
-    return {
-      'session_id': session.getSessionId(),
-      'branch': branch,
-      'host': host,
-      'flutter_version': flutterVersion,
-      'dart_version': dartVersion,
-      'tool': tool,
-      'local_time': '${clock.now()}',
-    };
-  }
+  Map<String, dynamic> _toMap() => <String, dynamic>{
+        'session_id': session.getSessionId(),
+        'branch': branch,
+        'host': host,
+        'flutter_version': flutterVersion,
+        'dart_version': dartVersion,
+        'tool': tool,
+        'local_time': '${clock.now()}',
+      };
 
   /// This method will take the data in this class and convert it into
   /// a Map that is suitable for the POST request schema
@@ -46,8 +44,9 @@ class UserProperty {
   ///
   /// https://developers.google.com/analytics/devguides/collection/protocol/ga4/user-properties?client_type=gtag
   Map<String, Map<String, dynamic>> preparePayload() {
-    return {
-      for (MapEntry entry in _toMap().entries) entry.key: {'value': entry.value}
+    return <String, Map<String, dynamic>>{
+      for (MapEntry<String, dynamic> entry in _toMap().entries)
+        entry.key: <String, dynamic>{'value': entry.value}
     };
   }
 

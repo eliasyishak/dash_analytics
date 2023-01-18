@@ -446,7 +446,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
-      final Map sessionObj = jsonDecode(sessionFileContents);
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
 
       expect(secondAnalytics.userPropertyMap['session_id']?['value'],
           start.millisecondsSinceEpoch);
@@ -479,12 +479,12 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       // Calling the send event method will result in the session file
       // getting updated but because we use the `Analytics.test()` constructor
       // no events will be sent
-      thirdAnalytics
-          .sendEvent(eventName: DashEvents.hotReloadTime, eventData: {});
+      thirdAnalytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
-      final Map sessionObj = jsonDecode(sessionFileContents);
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
 
       expect(thirdAnalytics.userPropertyMap['session_id']?['value'],
           start.millisecondsSinceEpoch,
@@ -525,7 +525,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
-      final Map sessionObj = jsonDecode(sessionFileContents);
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
 
       expect(secondAnalytics.userPropertyMap['session_id']?['value'],
           start.millisecondsSinceEpoch);
@@ -558,12 +558,12 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       // Calling the send event method will result in the session file
       // getting updated but because we use the `Analytics.test()` constructor
       // no events will be sent
-      thirdAnalytics
-          .sendEvent(eventName: DashEvents.hotReloadTime, eventData: {});
+      thirdAnalytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
-      final Map sessionObj = jsonDecode(sessionFileContents);
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
 
       expect(thirdAnalytics.userPropertyMap['session_id']?['value'],
           end.millisecondsSinceEpoch,

@@ -41,7 +41,7 @@ class GAClient {
   ///
   /// https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag
   /// ```
-  Future<http.Response> sendData(Map body) {
+  Future<http.Response> sendData(Map<String, dynamic> body) {
     return _client.post(
       Uri.parse(postUrl),
       headers: <String, String>{

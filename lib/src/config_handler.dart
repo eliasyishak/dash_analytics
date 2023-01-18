@@ -39,7 +39,7 @@ class ConfigHandler {
   final Initializer initializer;
   final File configFile;
 
-  final Map<String, ToolInfo> parsedTools = {};
+  final Map<String, ToolInfo> parsedTools = <String, ToolInfo>{};
 
   late DateTime configFileLastModified;
 
@@ -150,7 +150,7 @@ class ConfigHandler {
     final String configString = configFile.readAsStringSync();
 
     // Collect the tools logged in the configuration file
-    toolRegex.allMatches(configString).forEach((element) {
+    toolRegex.allMatches(configString).forEach((RegExpMatch element) {
       // Extract the information relevant for the [ToolInfo] class
       final String tool = element.group(1) as String;
       final DateTime lastRun = DateTime.parse(element.group(2) as String);
@@ -166,7 +166,7 @@ class ConfigHandler {
 
     // Check for lines signaling that the user has disabled analytics,
     // if multiple lines are found, the more conservative value will be used
-    telemetryFlagRegex.allMatches(configString).forEach((element) {
+    telemetryFlagRegex.allMatches(configString).forEach((RegExpMatch element) {
       // Conditional for recording telemetry as being disabled
       if (element.group(1) == '0') {
         _telemetryEnabled = false;
@@ -220,7 +220,7 @@ class ToolInfo {
 
   @override
   String toString() {
-    return json.encode({
+    return json.encode(<String, dynamic>{
       'lastRun': DateFormat('yyyy-MM-dd').format(lastRun),
       'versionNumber': versionNumber,
     });
