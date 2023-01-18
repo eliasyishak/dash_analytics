@@ -230,6 +230,12 @@ class AnalyticsImpl implements Analytics {
   }
 }
 
+/// This class extends [AnalyticsImpl] and subs out any methods that
+/// are not suitable for tests; the following have been altered from the
+/// default implementation. All other methods are included
+///
+/// - `sendEvent(...)` has been altered to prevent data from being sent to GA
+/// during testing
 class TestAnalytics extends AnalyticsImpl {
   TestAnalytics({
     required super.tool,
