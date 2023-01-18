@@ -49,7 +49,7 @@ reporting=1
 
 /// Name of the directory where all of the files necessary
 /// for this package will be located
-const String kDartToolDirectoryName = '.dart-tool';
+const String kDartToolDirectoryName = '.dart';
 
 /// The minimum length for a session
 const int kSessionDurationMinutes = 30;
