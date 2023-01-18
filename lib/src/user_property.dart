@@ -24,18 +24,6 @@ class UserProperty {
     required this.tool,
   });
 
-  /// Convert the data stored in this class into a map while also
-  /// getting the latest session id using the [Session] class
-  Map<String, dynamic> _toMap() => <String, dynamic>{
-        'session_id': session.getSessionId(),
-        'branch': branch,
-        'host': host,
-        'flutter_version': flutterVersion,
-        'dart_version': dartVersion,
-        'tool': tool,
-        'local_time': '${clock.now()}',
-      };
-
   /// This method will take the data in this class and convert it into
   /// a Map that is suitable for the POST request schema
   ///
@@ -54,4 +42,16 @@ class UserProperty {
   String toString() {
     return jsonEncode(_toMap());
   }
+
+  /// Convert the data stored in this class into a map while also
+  /// getting the latest session id using the [Session] class
+  Map<String, dynamic> _toMap() => <String, dynamic>{
+        'session_id': session.getSessionId(),
+        'branch': branch,
+        'host': host,
+        'flutter_version': flutterVersion,
+        'dart_version': dartVersion,
+        'tool': tool,
+        'local_time': '${clock.now()}',
+      };
 }
