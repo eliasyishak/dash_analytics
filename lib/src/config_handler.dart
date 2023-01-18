@@ -131,9 +131,14 @@ class ConfigHandler {
         configString.replaceAll(regex, newToolString);
     configFile.writeAsStringSync(newConfigString);
 
+    final ToolInfo? toolInfo = parsedTools[tool];
+    if (toolInfo == null) {
+      return;
+    }
+
     // Update the [ToolInfo] object for the current tool
-    parsedTools[tool]!.lastRun = clock.now();
-    parsedTools[tool]!.versionNumber = newVersionNumber;
+    toolInfo.lastRun = clock.now();
+    toolInfo.versionNumber = newVersionNumber;
   }
 
   /// Method responsible for reading in the config file stored on
