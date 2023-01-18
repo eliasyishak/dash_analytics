@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
 import 'constants.dart';
-import 'utils/uuid.dart';
+import 'utils.dart';
 
 class Initializer {
   final FileSystem fs;

@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io' as io;
 import 'dart:math' show Random;
+
+import 'package:file/file.dart';
 
 /// A UUID generator.
 ///
@@ -38,4 +41,22 @@ class Uuid {
 
   String _printDigits(int value, int count) =>
       value.toRadixString(16).padLeft(count, '0');
+}
+
+/// This will use environment variables to get the user's
+/// home directory where all the directory will be created that will
+/// contain all of the analytics files
+Directory getHomeDirectory(FileSystem fs) {
+  String? home;
+  Map<String, String> envVars = io.Platform.environment;
+
+  if (io.Platform.isMacOS) {
+    home = envVars['HOME'];
+  } else if (io.Platform.isLinux) {
+    home = envVars['HOME'];
+  } else if (io.Platform.isWindows) {
+    home = envVars['UserProfile'];
+  }
+
+  return fs.directory(home!);
 }

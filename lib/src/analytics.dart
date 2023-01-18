@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io' as io;
+
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:file/memory.dart';
@@ -14,33 +16,47 @@ import 'ga_client.dart';
 import 'initializer.dart';
 import 'session.dart';
 import 'user_property.dart';
+import 'utils.dart';
 
 abstract class Analytics {
   /// The default factory constructor that will return an implementation
   /// of the [Analytics] abstract class using the [LocalFileSystem]
   factory Analytics({
     required String tool,
-    required Directory homeDirectory,
     required String measurementId,
     required String apiSecret,
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    required DevicePlatform platform,
-  }) =>
-      AnalyticsImpl(
-        tool: tool,
-        homeDirectory: homeDirectory,
-        measurementId: measurementId,
-        apiSecret: apiSecret,
-        branch: branch,
-        flutterVersion: flutterVersion,
-        dartVersion: dartVersion,
-        platform: platform,
-        toolsMessage: kToolsMessage,
-        toolsMessageVersion: kToolsMessageVersion,
-        fs: const LocalFileSystem(),
-      );
+  }) {
+    // Create the instance of the file system so clients don't need
+    // resolve on their own
+    const FileSystem fs = LocalFileSystem();
+
+    // Resolve the OS using dart:io
+    final DevicePlatform platform;
+    if (io.Platform.operatingSystem == 'linux') {
+      platform = DevicePlatform.linux;
+    } else if (io.Platform.operatingSystem == 'macos') {
+      platform = DevicePlatform.macos;
+    } else {
+      platform = DevicePlatform.windows;
+    }
+
+    return AnalyticsImpl(
+      tool: tool,
+      homeDirectory: getHomeDirectory(fs),
+      measurementId: measurementId,
+      apiSecret: apiSecret,
+      branch: branch,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      platform: platform,
+      toolsMessage: kToolsMessage,
+      toolsMessageVersion: kToolsMessageVersion,
+      fs: fs,
+    );
+  }
 
   /// Factory constructor to return the [AnalyticsImpl] class with a
   /// [MemoryFileSystem] to use for testing
