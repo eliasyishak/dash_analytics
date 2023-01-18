@@ -37,7 +37,7 @@ final Analytics analytics = Analytics(
   branch: 'ey-test-branch',
   flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
   dartVersion: 'Dart 2.19.0',
-  platform: DevicePlatforms.macos,
+  platform: DevicePlatform.macos,
 );
 
 void main() async {

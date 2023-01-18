@@ -5,24 +5,27 @@
 enum DashEvents {
   hotReloadTime(
     label: 'hot_reload_time',
-    desc: 'Hot reload duration',
+    description: 'Hot reload duration',
+    toolOwner: 'flutter_tools',
   ),
   ;
 
   final String label;
-  final String desc;
+  final String description;
+  final String toolOwner;
   const DashEvents({
     required this.label,
-    required this.desc,
+    required this.description,
+    required this.toolOwner,
   });
 }
 
 /// Enumerate options for platform
-enum DevicePlatforms {
+enum DevicePlatform {
   windows('Windows'),
-  macos('Macintosh'),
+  macos('macOS'),
   linux('Linux');
 
   final String label;
-  const DevicePlatforms(this.label);
+  const DevicePlatform(this.label);
 }

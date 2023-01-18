@@ -28,7 +28,7 @@ void main() {
   const String branch = 'branch';
   const String flutterVersion = 'flutterVersion';
   const String dartVersion = 'dartVersion';
-  const DevicePlatforms platform = DevicePlatforms.macos;
+  const DevicePlatform platform = DevicePlatform.macos;
 
   setUp(() {
     // Setup the filesystem with the home directory
@@ -575,10 +575,10 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
   });
 
   test('Validate the available enum types for DevicePlatform', () {
-    expect(DevicePlatforms.values.length, 3,
+    expect(DevicePlatform.values.length, 3,
         reason: 'There should only be 3 supported device platforms');
-    expect(DevicePlatforms.values.contains(DevicePlatforms.windows), true);
-    expect(DevicePlatforms.values.contains(DevicePlatforms.macos), true);
-    expect(DevicePlatforms.values.contains(DevicePlatforms.linux), true);
+    expect(DevicePlatform.values.contains(DevicePlatform.windows), true);
+    expect(DevicePlatform.values.contains(DevicePlatform.macos), true);
+    expect(DevicePlatform.values.contains(DevicePlatform.linux), true);
   });
 }

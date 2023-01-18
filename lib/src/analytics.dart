@@ -22,7 +22,7 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    required DevicePlatforms platform,
+    required DevicePlatform platform,
   }) =>
       AnalyticsImpl(
         tool: tool,
@@ -51,7 +51,7 @@ abstract class Analytics {
     required int toolsMessageVersion,
     required String toolsMessage,
     required FileSystem fs,
-    required DevicePlatforms platform,
+    required DevicePlatform platform,
   }) =>
       TestAnalytics(
         tool: tool,
@@ -122,7 +122,7 @@ class AnalyticsImpl implements Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    required DevicePlatforms platform,
+    required DevicePlatform platform,
     required this.toolsMessage,
     required int toolsMessageVersion,
     required this.fs,

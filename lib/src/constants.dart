@@ -6,7 +6,7 @@ const String kAnalyticsUrl = 'https://www.google-analytics.com/mp/collect';
 const String kClientIdFileName = 'CLIENT_ID';
 
 /// Name for the file where telemetry status and tools data will be stored
-const String kConfigFileName = 'dart-flutter-telemetry.config';
+const String kConfigFileName = 'dash-analytics.config';
 
 /// The string that will provide the boilerplate for the
 /// configuration file stored on the user's machine
@@ -55,7 +55,7 @@ const String kDartToolDirectoryName = '.dart-tool';
 const int kSessionDurationMinutes = 30;
 
 /// Name for the json file where the session details will be stored
-const String kSessionFileName = 'session.json';
+const String kSessionFileName = 'dash-analytics-session.json';
 
 /// The message that should be shown to the user
 const String kToolsMessage = '''
