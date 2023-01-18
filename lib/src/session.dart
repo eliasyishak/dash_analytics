@@ -10,19 +10,43 @@ class Session {
   final Directory homeDirectory;
   final FileSystem fs;
   final File _sessionFile;
-  late int _sessionId;
-  late int _lastPing;
+  int _sessionId;
+  int _lastPing;
 
   /// This constructor will go to the session json file in
   /// the user's home directory and extract the necessary fields from
   /// the json file
-  Session({
+  factory Session({
+    required Directory homeDirectory,
+    required FileSystem fs,
+  }) {
+    final File sessionFile = fs.file(
+        p.join(homeDirectory.path, kDartToolDirectoryName, kSessionFileName));
+
+    final String sessionFileContents = sessionFile.readAsStringSync();
+    final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+    final int sessionId = sessionObj['session_id'] as int;
+    final int lastPing = sessionObj['last_ping'] as int;
+
+    return Session._(
+      homeDirectory: homeDirectory,
+      fs: fs,
+      sessionFile: sessionFile,
+      sessionId: sessionId,
+      lastPing: lastPing,
+    );
+  }
+
+  /// Private constructor that will have the variables necessary already parsed
+  Session._({
     required this.homeDirectory,
     required this.fs,
-  }) : _sessionFile = fs.file(p.join(
-            homeDirectory.path, kDartToolDirectoryName, kSessionFileName)) {
-    _refreshSessionData();
-  }
+    required File sessionFile,
+    required int sessionId,
+    required int lastPing,
+  })  : _sessionFile = sessionFile,
+        _sessionId = sessionId,
+        _lastPing = lastPing;
 
   /// This will use the data parsed from the
   /// session json file in the dart-tool directory
