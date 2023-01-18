@@ -7,6 +7,7 @@ import 'dart:io' as io;
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:file/memory.dart';
+import 'package:http/http.dart';
 import 'package:path/path.dart' as p;
 
 import 'config_handler.dart';
@@ -113,7 +114,7 @@ abstract class Analytics {
   void close();
 
   /// API to send events to Google Analytics to track usage
-  void sendEvent({
+  Future<Response>? sendEvent({
     required DashEvents eventName,
     required Map<String, dynamic> eventData,
   });
@@ -222,11 +223,11 @@ class AnalyticsImpl implements Analytics {
   void close() => _gaClient.close();
 
   @override
-  void sendEvent({
+  Future<Response>? sendEvent({
     required DashEvents eventName,
     required Map<String, dynamic> eventData,
   }) {
-    if (!telemetryEnabled) return;
+    if (!telemetryEnabled) return null;
 
     // Construct the body of the request
     final Map<String, dynamic> body = <String, dynamic>{
@@ -241,7 +242,7 @@ class AnalyticsImpl implements Analytics {
     };
 
     // Pass to the google analytics client to send
-    _gaClient.sendData(body);
+    return _gaClient.sendData(body);
   }
 
   @override
@@ -272,7 +273,7 @@ class TestAnalytics extends AnalyticsImpl {
   });
 
   @override
-  void sendEvent({
+  Future<Response>? sendEvent({
     required DashEvents eventName,
     required Map<String, dynamic> eventData,
   }) {
@@ -280,5 +281,7 @@ class TestAnalytics extends AnalyticsImpl {
     // session file is getting updated without actually making any
     // POST requests to Google Analytics
     userProperty.preparePayload();
+
+    return null;
   }
 }
