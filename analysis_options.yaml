@@ -19,6 +19,8 @@ linter:
   rules:
     - camel_case_types
     - prefer_single_quotes
+    - always_specify_types
+    - always_declare_return_types
 
 # analyzer:
 #   exclude:

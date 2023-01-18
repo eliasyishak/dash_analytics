@@ -8,7 +8,6 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
-import 'package:dash_analytics/src/enums.dart';
 
 void main() {
   late FileSystem fs;
@@ -449,7 +448,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(secondAnalytics.userPropertyMap['session_id']['value'],
+      expect(secondAnalytics.userPropertyMap['session_id']?['value'],
           start.millisecondsSinceEpoch);
       expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
     });
@@ -487,7 +486,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(thirdAnalytics.userPropertyMap['session_id']['value'],
+      expect(thirdAnalytics.userPropertyMap['session_id']?['value'],
           start.millisecondsSinceEpoch,
           reason: 'The session id should not have changed since it was made '
               'within the duration');
@@ -528,7 +527,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(secondAnalytics.userPropertyMap['session_id']['value'],
+      expect(secondAnalytics.userPropertyMap['session_id']?['value'],
           start.millisecondsSinceEpoch);
       expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
     });
@@ -566,7 +565,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       final String sessionFileContents = sessionFile.readAsStringSync();
       final Map sessionObj = jsonDecode(sessionFileContents);
 
-      expect(thirdAnalytics.userPropertyMap['session_id']['value'],
+      expect(thirdAnalytics.userPropertyMap['session_id']?['value'],
           end.millisecondsSinceEpoch,
           reason: 'The session id should have changed since it was made '
               'outside the duration');

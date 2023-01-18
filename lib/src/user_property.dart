@@ -45,7 +45,7 @@ class UserProperty {
   /// update the session file and get a new session id if necessary
   ///
   /// https://developers.google.com/analytics/devguides/collection/protocol/ga4/user-properties?client_type=gtag
-  Map preparePayload() {
+  Map<String, Map<String, dynamic>> preparePayload() {
     return {
       for (MapEntry entry in _toMap().entries) entry.key: {'value': entry.value}
     };

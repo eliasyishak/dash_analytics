@@ -84,7 +84,7 @@ abstract class Analytics {
   /// Returns a map representation of the [UserProperty] for the [Analytics] instance
   ///
   /// This is what will get sent to Google Analytics with every request
-  Map get userPropertyMap;
+  Map<String, Map<String, dynamic>> get userPropertyMap;
 
   /// Call this method when the tool using this package is closed
   ///
@@ -195,7 +195,8 @@ class AnalyticsImpl implements Analytics {
   bool get telemetryEnabled => _configHandler.telemetryEnabled;
 
   @override
-  Map get userPropertyMap => userProperty.preparePayload();
+  Map<String, Map<String, dynamic>> get userPropertyMap =>
+      userProperty.preparePayload();
 
   @override
   void close() => _gaClient.close();
