@@ -73,6 +73,8 @@ void main() {
   });
 
   test('Initializer properly sets up on first run', () {
+    expect(dartToolDirectory.existsSync(), true,
+        reason: 'The directory should have been created');
     expect(clientIdFile.existsSync(), true,
         reason: 'The $kClientIdFileName file was not found');
     expect(sessionFile.existsSync(), true,
