@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
+import 'dart:io' as io;
 
 import 'package:clock/clock.dart';
 import 'package:file/file.dart';
@@ -36,7 +37,9 @@ void main() {
 
   setUp(() {
     // Setup the filesystem with the home directory
-    fs = MemoryFileSystem.test();
+    final FileSystemStyle fsStyle =
+        io.Platform.isWindows ? FileSystemStyle.windows : FileSystemStyle.posix;
+    fs = MemoryFileSystem.test(style: fsStyle);
     home = fs.directory(homeDirName);
     dartToolDirectory = home.childDirectory(kDartToolDirectoryName);
 
