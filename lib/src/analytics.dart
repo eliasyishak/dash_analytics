@@ -230,16 +230,12 @@ class AnalyticsImpl implements Analytics {
     if (!telemetryEnabled) return null;
 
     // Construct the body of the request
-    final Map<String, dynamic> body = <String, dynamic>{
-      'client_id': _clientId,
-      'events': <Map<String, dynamic>>[
-        <String, dynamic>{
-          'name': eventName.label,
-          'params': eventData,
-        }
-      ],
-      'user_properties': userProperty.preparePayload()
-    };
+    final Map<String, dynamic> body = generateRequestBody(
+      clientId: _clientId,
+      eventName: eventName,
+      eventData: eventData,
+      userProperty: userProperty,
+    );
 
     // Pass to the google analytics client to send
     return _gaClient.sendData(body);
@@ -277,10 +273,17 @@ class TestAnalytics extends AnalyticsImpl {
     required DashEvents eventName,
     required Map<String, dynamic> eventData,
   }) {
-    // Calling the prepare payload method will ensure that the
+    if (!telemetryEnabled) return null;
+
+    // Calling the [generateRequestBody] method will ensure that the
     // session file is getting updated without actually making any
     // POST requests to Google Analytics
-    userProperty.preparePayload();
+    generateRequestBody(
+      clientId: _clientId,
+      eventName: eventName,
+      eventData: eventData,
+      userProperty: userProperty,
+    );
 
     return null;
   }
