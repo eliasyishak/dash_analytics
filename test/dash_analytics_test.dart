@@ -119,29 +119,29 @@ void main() {
             'The config file should have the same message from the constants file');
   });
 
-  test('Toggling telemetry boolean through Analytics class api', () {
+  test('Toggling telemetry boolean through Analytics class api', () async {
     expect(analytics.telemetryEnabled, true,
         reason: 'Telemetry should be enabled by default '
             'when initialized for the first time');
 
     // Use the API to disable analytics
-    analytics.setTelemetry(false);
+    await analytics.setTelemetry(false);
     expect(analytics.telemetryEnabled, false,
         reason: 'Analytics telemetry should be disabled');
 
     // Toggle it back to being enabled
-    analytics.setTelemetry(true);
+    await analytics.setTelemetry(true);
     expect(analytics.telemetryEnabled, true,
         reason: 'Analytics telemetry should be enabled');
   });
 
   test(
       'Telemetry has been disabled by one '
-      'tool and second tool correctly shows telemetry is disabled', () {
+      'tool and second tool correctly shows telemetry is disabled', () async {
     expect(analytics.telemetryEnabled, true,
         reason: 'Analytics telemetry should be enabled on initialization');
     // Use the API to disable analytics
-    analytics.setTelemetry(false);
+    await analytics.setTelemetry(false);
     expect(analytics.telemetryEnabled, false,
         reason: 'Analytics telemetry should be disabled');
 
@@ -168,7 +168,7 @@ void main() {
 
   test(
       'Two concurrent instances are running '
-      'and reflect an accurate up to date telemetry status', () {
+      'and reflect an accurate up to date telemetry status', () async {
     // Initialize a second analytics class, which simulates a second tool
     final Analytics secondAnalytics = Analytics.test(
       tool: secondTool,
@@ -192,7 +192,7 @@ void main() {
             'second analytics instance');
 
     // Use the API to disable analytics on the first instance
-    analytics.setTelemetry(false);
+    await analytics.setTelemetry(false);
     expect(analytics.telemetryEnabled, false,
         reason: 'Analytics telemetry should be disabled on first instance');
 
@@ -274,7 +274,7 @@ void main() {
 
   test(
       'Config file resets when there is not exactly one match for the reporting flag',
-      () {
+      () async {
     // Write to the config file a string that is not formatted correctly
     // (ie. there is more than one match for the reporting flag)
     configFile.writeAsStringSync('''
@@ -316,7 +316,7 @@ reporting=1
 # displayed.''');
 
     // Disable telemetry which should result in a reset of the config file
-    analytics.setTelemetry(false);
+    await analytics.setTelemetry(false);
 
     expect(configFile.readAsStringSync().startsWith(kConfigString), true,
         reason: 'The tool should have reset the config file '

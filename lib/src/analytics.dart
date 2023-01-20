@@ -121,7 +121,7 @@ abstract class Analytics {
 
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
-  void setTelemetry(bool reportingBool);
+  Future<void> setTelemetry(bool reportingBool);
 }
 
 class AnalyticsImpl implements Analytics {
@@ -242,8 +242,8 @@ class AnalyticsImpl implements Analytics {
   }
 
   @override
-  void setTelemetry(bool reportingBool) {
-    Future<void>(() => _configHandler.setTelemetry(reportingBool));
+  Future<void> setTelemetry(bool reportingBool) {
+    return Future<void>(() => _configHandler.setTelemetry(reportingBool));
   }
 }
 
