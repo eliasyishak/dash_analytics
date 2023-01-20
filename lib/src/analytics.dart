@@ -69,9 +69,9 @@ abstract class Analytics {
     required String branch,
     required String flutterVersion,
     required String dartVersion,
-    required int toolsMessageVersion,
-    required String toolsMessage,
-    required FileSystem fs,
+    int toolsMessageVersion = kToolsMessageVersion,
+    String toolsMessage = kToolsMessage,
+    FileSystem? fs,
     required DevicePlatform platform,
   }) =>
       TestAnalytics(
@@ -85,7 +85,12 @@ abstract class Analytics {
         flutterVersion: flutterVersion,
         dartVersion: dartVersion,
         platform: platform,
-        fs: fs,
+        fs: fs ??
+            MemoryFileSystem.test(
+              style: io.Platform.isWindows
+                  ? FileSystemStyle.windows
+                  : FileSystemStyle.posix,
+            ),
       );
 
   /// Returns a map object with all of the tools that have been parsed
