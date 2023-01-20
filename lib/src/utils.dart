@@ -10,7 +10,8 @@ import 'package:file/file.dart';
 import 'enums.dart';
 import 'user_property.dart';
 
-/// Construct the body of the response to be sent to Google Analytics
+/// Construct the Map that will be converted to json for the
+/// body of the request
 ///
 /// Follows the following schema
 ///

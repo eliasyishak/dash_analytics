@@ -13,6 +13,9 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
+import 'package:dash_analytics/src/session.dart';
+import 'package:dash_analytics/src/user_property.dart';
+import 'package:dash_analytics/src/utils.dart';
 
 void main() {
   late FileSystem fs;
@@ -22,6 +25,7 @@ void main() {
   late File clientIdFile;
   late File sessionFile;
   late File configFile;
+  late UserProperty userProperty;
 
   const String homeDirName = 'home';
   const String initialToolName = 'initialTool';
@@ -67,6 +71,17 @@ void main() {
         home.childDirectory(kDartToolDirectoryName).childFile(kSessionFileName);
     configFile =
         home.childDirectory(kDartToolDirectoryName).childFile(kConfigFileName);
+
+    // Create the user property object that is also
+    // created within analytics for testing
+    userProperty = UserProperty(
+      session: Session(homeDirectory: home, fs: fs),
+      branch: branch,
+      host: platform.label,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      tool: initialToolName,
+    );
   });
 
   tearDown(() {
@@ -589,5 +604,45 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(DevicePlatform.values.contains(DevicePlatform.windows), true);
     expect(DevicePlatform.values.contains(DevicePlatform.macos), true);
     expect(DevicePlatform.values.contains(DevicePlatform.linux), true);
+  });
+
+  test('Validate the request body', () {
+    // Sample map for event data
+    final Map<String, dynamic> eventData = <String, dynamic>{
+      'time': 5,
+      'command': 'run',
+    };
+
+    final Map<String, dynamic> body = generateRequestBody(
+      clientId: Uuid().generateV4(),
+      eventName: DashEvents.hotReloadTime,
+      eventData: eventData,
+      userProperty: userProperty,
+    );
+
+    // Checks for the top level keys
+    expect(body.containsKey('client_id'), true,
+        reason: '"client_id" is required at the top level');
+    expect(body.containsKey('events'), true,
+        reason: '"events" is required at the top level');
+    expect(body.containsKey('user_properties'), true,
+        reason: '"user_properties" is required at the top level');
+
+    // Regex for the client id
+    final RegExp clientIdPattern = RegExp(
+        r'^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$');
+
+    // Checks for the top level values
+    expect(body['client_id'].runtimeType, String,
+        reason: 'The client id must be a string');
+    expect(clientIdPattern.hasMatch(body['client_id']), true,
+        reason: 'The client id is not properly formatted, ie '
+            '46cc0ba6-f604-4fd9-aa2f-8a20beb24cd4');
+    expect(
+        (body['events'][0] as Map<String, dynamic>).containsKey('name'), true,
+        reason: 'Each event in the events array needs a name');
+    expect(
+        (body['events'][0] as Map<String, dynamic>).containsKey('params'), true,
+        reason: 'Each event in the events array needs a params key');
   });
 }
