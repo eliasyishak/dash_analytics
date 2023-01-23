@@ -15,6 +15,7 @@ import 'constants.dart';
 import 'enums.dart';
 import 'ga_client.dart';
 import 'initializer.dart';
+import 'log_handler.dart';
 import 'session.dart';
 import 'user_property.dart';
 import 'utils.dart';
@@ -136,6 +137,7 @@ class AnalyticsImpl implements Analytics {
   late final GAClient _gaClient;
   late final String _clientId;
   late final UserProperty userProperty;
+  late final LogHandler _logHandler;
 
   @override
   final String toolsMessage;
@@ -209,6 +211,9 @@ class AnalyticsImpl implements Analytics {
       dartVersion: dartVersion,
       tool: tool,
     );
+
+    // Initialize the log handler to persist events that are being sent
+    _logHandler = LogHandler(fs: fs, homeDirectory: homeDirectory);
   }
 
   @override
@@ -242,8 +247,11 @@ class AnalyticsImpl implements Analytics {
       userProperty: userProperty,
     );
 
+    _logHandler.save(data: body);
+
     // Pass to the google analytics client to send
-    return _gaClient.sendData(body);
+    // return _gaClient.sendData(body); TODO: uncomment once log handler is complete
+    return null;
   }
 
   @override
