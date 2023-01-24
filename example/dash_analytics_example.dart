@@ -20,7 +20,7 @@ final Analytics analytics = Analytics(
   dartVersion: 'Dart 2.19.0',
 );
 
-void main() async {
+void main() {
   DateTime start = DateTime.now();
   print('###### START ###### $start');
 
