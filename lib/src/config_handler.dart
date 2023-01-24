@@ -192,7 +192,7 @@ class ConfigHandler {
   }
 
   /// Disables the reporting capabilities if false is passed
-  void setTelemetry(bool reportingBool) {
+  void setTelemetry(bool reportingBool) async {
     final String flag = reportingBool ? '1' : '0';
     final String configString = configFile.readAsStringSync();
 
