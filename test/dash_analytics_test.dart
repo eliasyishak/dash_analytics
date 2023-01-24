@@ -25,6 +25,7 @@ void main() {
   late File clientIdFile;
   late File sessionFile;
   late File configFile;
+  late File logFile;
   late UserProperty userProperty;
 
   const String homeDirName = 'home';
@@ -71,6 +72,8 @@ void main() {
         home.childDirectory(kDartToolDirectoryName).childFile(kSessionFileName);
     configFile =
         home.childDirectory(kDartToolDirectoryName).childFile(kConfigFileName);
+    logFile =
+        home.childDirectory(kDartToolDirectoryName).childFile(kLogFileName);
 
     // Create the user property object that is also
     // created within analytics for testing
@@ -93,9 +96,11 @@ void main() {
         reason: 'The $kSessionFileName file was not found');
     expect(configFile.existsSync(), true,
         reason: 'The $kConfigFileName was not found');
-    expect(dartToolDirectory.listSync().length, equals(3),
+    expect(logFile.existsSync(), true,
+        reason: 'The $kLogFileName file was not found');
+    expect(dartToolDirectory.listSync().length, equals(4),
         reason:
-            'There should only be 3 files in the $kDartToolDirectoryName directory');
+            'There should only be 4 files in the $kDartToolDirectoryName directory');
     expect(analytics.shouldShowMessage, true,
         reason: 'For the first run, analytics should default to being enabled');
   });
