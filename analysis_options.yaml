@@ -17,10 +17,11 @@ include: package:lints/recommended.yaml
 
 linter:
   rules:
+    - always_declare_return_types
+    - always_specify_types
     - camel_case_types
     - prefer_single_quotes
-    - always_specify_types
-    - always_declare_return_types
+    - unawaited_futures
 
 # analyzer:
 #   exclude:
