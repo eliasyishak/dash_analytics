@@ -192,9 +192,9 @@ class ConfigHandler {
   }
 
   /// Disables the reporting capabilities if false is passed
-  void setTelemetry(bool reportingBool) {
+  Future<void> setTelemetry(bool reportingBool) async {
     final String flag = reportingBool ? '1' : '0';
-    final String configString = configFile.readAsStringSync();
+    final String configString = await configFile.readAsString();
 
     final Iterable<RegExpMatch> matches =
         telemetryFlagRegex.allMatches(configString);
@@ -211,7 +211,7 @@ class ConfigHandler {
     final String newConfigString =
         configString.replaceAll(telemetryFlagRegex, newTelemetryString);
 
-    configFile.writeAsStringSync(newConfigString);
+    await configFile.writeAsString(newConfigString);
     configFileLastModified = configFile.lastModifiedSync();
 
     _telemetryEnabled = reportingBool;

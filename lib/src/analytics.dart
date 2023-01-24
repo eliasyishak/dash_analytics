@@ -126,7 +126,7 @@ abstract class Analytics {
 
   /// Pass a boolean to either enable or disable telemetry and make
   /// the necessary changes in the persisted configuration file
-  void setTelemetry(bool reportingBool);
+  Future<void> setTelemetry(bool reportingBool);
 }
 
 class AnalyticsImpl implements Analytics {
@@ -246,12 +246,8 @@ class AnalyticsImpl implements Analytics {
     return _gaClient.sendData(body);
   }
 
-  // TODO: (christopherfujino) -- convert to async to free up resources while
-  //  file I/O related processes run in background for config file
   @override
-  void setTelemetry(bool reportingBool) {
-    _configHandler.setTelemetry(reportingBool);
-  }
+  Future<void> setTelemetry(bool reportingBool) => _configHandler.setTelemetry(reportingBool);
 }
 
 /// This class extends [AnalyticsImpl] and subs out any methods that
