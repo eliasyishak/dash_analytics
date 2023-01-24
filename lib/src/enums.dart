@@ -4,7 +4,7 @@
 
 /// Values for the event name to be sent to Google Analytics
 ///
-/// The [label] for each enum value is what will be logged, the [desc]
+/// The [label] for each enum value is what will be logged, the [description]
 /// is here for documentation purposes
 enum DashEvents {
   hotReloadTime(
