@@ -1,3 +1,11 @@
+// Copyright 2014 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'dart:convert';
+import 'dart:io' as io;
+
+import 'package:clock/clock.dart';
 import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
@@ -5,6 +13,9 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
+import 'package:dash_analytics/src/session.dart';
+import 'package:dash_analytics/src/user_property.dart';
+import 'package:dash_analytics/src/utils.dart';
 
 void main() {
   late FileSystem fs;
@@ -14,7 +25,9 @@ void main() {
   late File clientIdFile;
   late File sessionFile;
   late File configFile;
+  late UserProperty userProperty;
 
+  const String homeDirName = 'home';
   const String initialToolName = 'initialTool';
   const String secondTool = 'newTool';
   const String measurementId = 'measurementId';
@@ -24,13 +37,18 @@ void main() {
   const String branch = 'branch';
   const String flutterVersion = 'flutterVersion';
   const String dartVersion = 'dartVersion';
+  const DevicePlatform platform = DevicePlatform.macos;
 
   setUp(() {
     // Setup the filesystem with the home directory
-    fs = MemoryFileSystem.test();
-    home = fs.directory('home');
-    dartToolDirectory = home.childDirectory('.dart-tool');
+    final FileSystemStyle fsStyle =
+        io.Platform.isWindows ? FileSystemStyle.windows : FileSystemStyle.posix;
+    fs = MemoryFileSystem.test(style: fsStyle);
+    home = fs.directory(homeDirName);
+    dartToolDirectory = home.childDirectory(kDartToolDirectoryName);
 
+    // The main analytics instance, other instances can be spawned within tests
+    // to test how to instances running together work
     analytics = Analytics.test(
       tool: initialToolName,
       homeDirectory: home,
@@ -42,29 +60,48 @@ void main() {
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     // The 3 files that should have been generated
-    clientIdFile = home.childDirectory('.dart-tool').childFile('CLIENT_ID');
-    sessionFile = home.childDirectory('.dart-tool').childFile('session.json');
-    configFile = home
-        .childDirectory('.dart-tool')
-        .childFile('dart-flutter-telemetry.config');
+    clientIdFile = home
+        .childDirectory(kDartToolDirectoryName)
+        .childFile(kClientIdFileName);
+    sessionFile =
+        home.childDirectory(kDartToolDirectoryName).childFile(kSessionFileName);
+    configFile =
+        home.childDirectory(kDartToolDirectoryName).childFile(kConfigFileName);
+
+    // Create the user property object that is also
+    // created within analytics for testing
+    userProperty = UserProperty(
+      session: Session(homeDirectory: home, fs: fs),
+      branch: branch,
+      host: platform.label,
+      flutterVersion: flutterVersion,
+      dartVersion: dartVersion,
+      tool: initialToolName,
+    );
   });
 
   tearDown(() {
-    dartToolDirectory.deleteSync(recursive: true);
+    if (dartToolDirectory.existsSync()) {
+      dartToolDirectory.deleteSync(recursive: true);
+    }
   });
 
   test('Initializer properly sets up on first run', () {
+    expect(dartToolDirectory.existsSync(), true,
+        reason: 'The directory should have been created');
     expect(clientIdFile.existsSync(), true,
-        reason: 'The CLIENT_ID file was not found');
+        reason: 'The $kClientIdFileName file was not found');
     expect(sessionFile.existsSync(), true,
-        reason: 'The session.json file was not found');
+        reason: 'The $kSessionFileName file was not found');
     expect(configFile.existsSync(), true,
-        reason: 'The dart-flutter-telemetry.config was not found');
+        reason: 'The $kConfigFileName was not found');
     expect(dartToolDirectory.listSync().length, equals(3),
-        reason: 'There should only be 3 files in the .dart-tool directory');
+        reason:
+            'There should only be 3 files in the $kDartToolDirectoryName directory');
     expect(analytics.shouldShowMessage, true,
         reason: 'For the first run, analytics should default to being enabled');
   });
@@ -82,6 +119,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.parsedTools.length, equals(2),
@@ -135,6 +173,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.telemetryEnabled, false,
@@ -157,6 +196,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
 
     expect(analytics.telemetryEnabled, true,
@@ -209,6 +249,7 @@ void main() {
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
       dartVersion: 'Dart 2.19.0',
       fs: fs,
+      platform: platform,
     );
     expect(secondAnalytics.telemetryEnabled, true);
 
@@ -237,6 +278,7 @@ void main() {
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     expect(secondAnalytics.parsedTools[initialToolName]?.versionNumber,
@@ -357,6 +399,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
       fs: fs,
+      platform: platform,
     );
 
     expect(
@@ -371,5 +414,235 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       toolsMessageVersion + 1,
       reason: 'The new version should have been incremented',
     );
+  });
+
+  test('Check that UserProperty class has all the necessary keys', () {
+    expect(analytics.userPropertyMap.keys.contains('session_id'), true,
+        reason: 'The session_id variable is required');
+    expect(analytics.userPropertyMap.keys.contains('branch'), true,
+        reason: 'The branch variable is required');
+    expect(analytics.userPropertyMap.keys.contains('host'), true,
+        reason: 'The host variable is required');
+    expect(analytics.userPropertyMap.keys.contains('flutter_version'), true,
+        reason: 'The flutter_version variable is required');
+    expect(analytics.userPropertyMap.keys.contains('dart_version'), true,
+        reason: 'The dart_version variable is required');
+    expect(analytics.userPropertyMap.keys.contains('tool'), true,
+        reason: 'The tool variable is required');
+    expect(analytics.userPropertyMap.keys.contains('local_time'), true,
+        reason: 'The local_time variable is required');
+  });
+
+  test('The minimum session duration should be at least 30 minutes', () {
+    expect(kSessionDurationMinutes < 30, false,
+        reason: 'Session is less than 30 minutes');
+  });
+
+  test(
+      'The session id stays the same when duration'
+      ' is less than the constraint', () {
+    // For this test, we will need control clock time so we will delete
+    // the [dartToolDirectory] and all of its contents and reconstruct a
+    // new [Analytics] instance at a specific time
+    dartToolDirectory.deleteSync(recursive: true);
+    expect(dartToolDirectory.existsSync(), false,
+        reason: 'The directory should have been cleared');
+
+    // Define the initial time to start
+    final DateTime start = DateTime(1995, 3, 3, 12, 0);
+
+    // Set the clock to the start value defined above
+    withClock(Clock.fixed(start), () {
+      // This class will be constructed at a fixed time
+      final Analytics secondAnalytics = Analytics.test(
+        tool: secondTool,
+        homeDirectory: home,
+        measurementId: 'measurementId',
+        apiSecret: 'apiSecret',
+        branch: 'ey-test-branch',
+        toolsMessageVersion: toolsMessageVersion,
+        toolsMessage: toolsMessage,
+        flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+        dartVersion: 'Dart 2.19.0',
+        fs: fs,
+        platform: platform,
+      );
+
+      // Read the contents of the session file
+      final String sessionFileContents = sessionFile.readAsStringSync();
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+
+      expect(secondAnalytics.userPropertyMap['session_id']?['value'],
+          start.millisecondsSinceEpoch);
+      expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
+    });
+
+    // Add time to the start time that is less than the duration
+    final DateTime end =
+        start.add(Duration(minutes: kSessionDurationMinutes - 1));
+
+    // Use a new clock to ensure that the session id didn't change
+    withClock(Clock.fixed(end), () {
+      // A new instance will need to be created since the second
+      // instance in the previous block is scoped - this new instance
+      // should not reset the files generated by the second instance
+      final Analytics thirdAnalytics = Analytics.test(
+        tool: secondTool,
+        homeDirectory: home,
+        measurementId: 'measurementId',
+        apiSecret: 'apiSecret',
+        branch: 'ey-test-branch',
+        toolsMessageVersion: toolsMessageVersion,
+        toolsMessage: toolsMessage,
+        flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+        dartVersion: 'Dart 2.19.0',
+        fs: fs,
+        platform: platform,
+      );
+
+      // Calling the send event method will result in the session file
+      // getting updated but because we use the `Analytics.test()` constructor
+      // no events will be sent
+      thirdAnalytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+
+      // Read the contents of the session file
+      final String sessionFileContents = sessionFile.readAsStringSync();
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+
+      expect(thirdAnalytics.userPropertyMap['session_id']?['value'],
+          start.millisecondsSinceEpoch,
+          reason: 'The session id should not have changed since it was made '
+              'within the duration');
+      expect(sessionObj['last_ping'], end.millisecondsSinceEpoch,
+          reason: 'The last_ping value should have been updated');
+    });
+  });
+
+  test('The session id is refreshed once event is sent after duration', () {
+    // For this test, we will need control clock time so we will delete
+    // the [dartToolDirectory] and all of its contents and reconstruct a
+    // new [Analytics] instance at a specific time
+    dartToolDirectory.deleteSync(recursive: true);
+    expect(dartToolDirectory.existsSync(), false,
+        reason: 'The directory should have been cleared');
+
+    // Define the initial time to start
+    final DateTime start = DateTime(1995, 3, 3, 12, 0);
+
+    // Set the clock to the start value defined above
+    withClock(Clock.fixed(start), () {
+      // This class will be constructed at a fixed time
+      final Analytics secondAnalytics = Analytics.test(
+        tool: secondTool,
+        homeDirectory: home,
+        measurementId: 'measurementId',
+        apiSecret: 'apiSecret',
+        branch: 'ey-test-branch',
+        toolsMessageVersion: toolsMessageVersion,
+        toolsMessage: toolsMessage,
+        flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+        dartVersion: 'Dart 2.19.0',
+        fs: fs,
+        platform: platform,
+      );
+
+      // Read the contents of the session file
+      final String sessionFileContents = sessionFile.readAsStringSync();
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+
+      expect(secondAnalytics.userPropertyMap['session_id']?['value'],
+          start.millisecondsSinceEpoch);
+      expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
+    });
+
+    // Add time to the start time that is less than the duration
+    final DateTime end =
+        start.add(Duration(minutes: kSessionDurationMinutes + 1));
+
+    // Use a new clock to ensure that the session id didn't change
+    withClock(Clock.fixed(end), () {
+      // A new instance will need to be created since the second
+      // instance in the previous block is scoped - this new instance
+      // should not reset the files generated by the second instance
+      final Analytics thirdAnalytics = Analytics.test(
+        tool: secondTool,
+        homeDirectory: home,
+        measurementId: 'measurementId',
+        apiSecret: 'apiSecret',
+        branch: 'ey-test-branch',
+        toolsMessageVersion: toolsMessageVersion,
+        toolsMessage: toolsMessage,
+        flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+        dartVersion: 'Dart 2.19.0',
+        fs: fs,
+        platform: platform,
+      );
+
+      // Calling the send event method will result in the session file
+      // getting updated but because we use the `Analytics.test()` constructor
+      // no events will be sent
+      thirdAnalytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+
+      // Read the contents of the session file
+      final String sessionFileContents = sessionFile.readAsStringSync();
+      final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+
+      expect(thirdAnalytics.userPropertyMap['session_id']?['value'],
+          end.millisecondsSinceEpoch,
+          reason: 'The session id should have changed since it was made '
+              'outside the duration');
+      expect(sessionObj['last_ping'], end.millisecondsSinceEpoch,
+          reason: 'The last_ping value should have been updated');
+    });
+  });
+
+  test('Validate the available enum types for DevicePlatform', () {
+    expect(DevicePlatform.values.length, 3,
+        reason: 'There should only be 3 supported device platforms');
+    expect(DevicePlatform.values.contains(DevicePlatform.windows), true);
+    expect(DevicePlatform.values.contains(DevicePlatform.macos), true);
+    expect(DevicePlatform.values.contains(DevicePlatform.linux), true);
+  });
+
+  test('Validate the request body', () {
+    // Sample map for event data
+    final Map<String, dynamic> eventData = <String, dynamic>{
+      'time': 5,
+      'command': 'run',
+    };
+
+    final Map<String, dynamic> body = generateRequestBody(
+      clientId: Uuid().generateV4(),
+      eventName: DashEvents.hotReloadTime,
+      eventData: eventData,
+      userProperty: userProperty,
+    );
+
+    // Checks for the top level keys
+    expect(body.containsKey('client_id'), true,
+        reason: '"client_id" is required at the top level');
+    expect(body.containsKey('events'), true,
+        reason: '"events" is required at the top level');
+    expect(body.containsKey('user_properties'), true,
+        reason: '"user_properties" is required at the top level');
+
+    // Regex for the client id
+    final RegExp clientIdPattern = RegExp(
+        r'^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$');
+
+    // Checks for the top level values
+    expect(body['client_id'].runtimeType, String,
+        reason: 'The client id must be a string');
+    expect(clientIdPattern.hasMatch(body['client_id']), true,
+        reason: 'The client id is not properly formatted, ie '
+            '46cc0ba6-f604-4fd9-aa2f-8a20beb24cd4');
+    expect(
+        (body['events'][0] as Map<String, dynamic>).containsKey('name'), true,
+        reason: 'Each event in the events array needs a name');
+    expect(
+        (body['events'][0] as Map<String, dynamic>).containsKey('params'), true,
+        reason: 'Each event in the events array needs a params key');
   });
 }
