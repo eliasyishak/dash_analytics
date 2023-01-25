@@ -119,6 +119,9 @@ abstract class Analytics {
   /// that need to be sent off
   void close();
 
+  /// Query the persisted event data stored on the user's machine
+  Map<String, dynamic> query(LogFileQuery q);
+
   /// API to send events to Google Analytics to track usage
   Future<Response>? sendEvent({
     required DashEvents eventName,
@@ -231,6 +234,9 @@ class AnalyticsImpl implements Analytics {
 
   @override
   void close() => _gaClient.close();
+
+  @override
+  Map<String, dynamic> query(LogFileQuery q) => _logHandler.query(q);
 
   @override
   Future<Response>? sendEvent({

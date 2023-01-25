@@ -4,6 +4,7 @@ import 'package:file/file.dart';
 import 'package:path/path.dart' as p;
 
 import 'constants.dart';
+import 'enums.dart';
 import 'initializer.dart';
 
 class LogHandler {
@@ -43,5 +44,30 @@ class LogHandler {
 
       logFile.writeAsStringSync(records.join('\n'));
     }
+  }
+
+  /// Query the persisted log file using the persisted log file
+  Map<String, dynamic> query(LogFileQuery q) {
+    Iterable<Map<String, dynamic>> records =
+        logFile.readAsLinesSync().map((String e) => jsonDecode(e));
+    Map<String, dynamic> results = <String, dynamic>{};
+
+    // Get the start and end dates for the log file
+    results['start_datetime'] =
+        DateTime.parse(records.first['user_properties']['local_time']['value']);
+    results['end_datetime'] =
+        DateTime.parse(records.last['user_properties']['local_time']['value']);
+
+    switch (q) {
+      case LogFileQuery.sessionCount:
+        final Set<int> sessions = <int>{};
+        for (Map<String, dynamic> element in records) {
+          sessions.add(element['user_properties']['session_id']['value']);
+        }
+        results['session_count'] = sessions.length;
+        break;
+    }
+
+    return results;
   }
 }

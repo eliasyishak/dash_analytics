@@ -24,12 +24,37 @@ enum DashEvents {
   });
 }
 
+/// The tools that have been onboarded
+enum DashTools {
+  flutterTools(
+    label: 'flutter_tools',
+    description: 'Runs flutter applications',
+  ),
+  ;
+
+  final String label;
+  final String description;
+  const DashTools({
+    required this.label,
+    required this.description,
+  });
+}
+
 /// Enumerate options for platform
 enum DevicePlatform {
   windows('Windows'),
   macos('macOS'),
-  linux('Linux');
+  linux('Linux'),
+  ;
 
   final String label;
   const DevicePlatform(this.label);
+}
+
+// Supported queries on the persisted log file
+enum LogFileQuery {
+  /// Returns the unique number of sessions along with how the start
+  /// and end dates for the entire log file
+  sessionCount,
+  ;
 }
