@@ -255,7 +255,8 @@ class AnalyticsImpl implements Analytics {
   }
 
   @override
-  Future<void> setTelemetry(bool reportingBool) => _configHandler.setTelemetry(reportingBool);
+  Future<void> setTelemetry(bool reportingBool) =>
+      _configHandler.setTelemetry(reportingBool);
 }
 
 /// This class extends [AnalyticsImpl] and subs out any methods that
