@@ -20,7 +20,7 @@ final Analytics analytics = Analytics(
   dartVersion: 'Dart 2.19.0',
 );
 
-Future<void> main() async {
+void main() {
   DateTime start = DateTime.now();
   print('###### START ###### $start');
 
@@ -29,7 +29,7 @@ Future<void> main() async {
   // TODO: remove this code after PR is completed
   for (int i = 0; i < 500; i++) {
     begin = DateTime.now();
-    await analytics.sendEvent(
+    analytics.sendEvent(
       eventName: DashEvents.hotReloadTime,
       eventData: <String, int>{'time_ns': i},
     );
