@@ -20,15 +20,21 @@ final Analytics analytics = Analytics(
   dartVersion: 'Dart 2.19.0',
 );
 
-void main() {
+Future<void> main() async {
   DateTime start = DateTime.now();
   print('###### START ###### $start');
 
   print(analytics.telemetryEnabled);
-  analytics.sendEvent(
-    eventName: DashEvents.hotReloadTime,
-    eventData: <String, int>{'time_ns': 345},
-  );
+  DateTime begin;
+  // TODO: remove this code after PR is completed
+  for (int i = 0; i < 500; i++) {
+    begin = DateTime.now();
+    await analytics.sendEvent(
+      eventName: DashEvents.hotReloadTime,
+      eventData: <String, int>{'time_ns': i},
+    );
+    print('${DateTime.now().difference(begin).inMicroseconds}');
+  }
   analytics.close();
 
   DateTime end = DateTime.now();
