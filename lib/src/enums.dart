@@ -25,6 +25,9 @@ enum DashEvents {
 }
 
 /// The tools that have been onboarded
+///
+/// All tools should use an underscore instead of
+/// a hyphen to split text
 enum DashTools {
   flutterTools(
     label: 'flutter_tools',
