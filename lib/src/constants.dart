@@ -56,7 +56,7 @@ reporting=1
 const String kDartToolDirectoryName = '.dart';
 
 /// How many data records to store in the log file
-const int kLogFileLength = 100;
+const int kLogFileLength = 2500;
 
 /// Filename for the log file to persist sent events on user's machine
 const String kLogFileName = 'dash-analytics.log';

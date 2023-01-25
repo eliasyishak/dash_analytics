@@ -30,7 +30,7 @@ class LogHandler {
   /// This will keep the max number of records limited to equal to
   /// or less than [kLogFileLength] records
   void save({required Map<String, dynamic> data}) {
-    final List<String> records = logFile.readAsLinesSync();
+    List<String> records = logFile.readAsLinesSync();
     final String content = '${jsonEncode(data)}\n';
 
     // When the record count is less than the max, add as normal;
@@ -38,8 +38,8 @@ class LogHandler {
     if (records.length < kLogFileLength) {
       logFile.writeAsStringSync(content, mode: FileMode.writeOnlyAppend);
     } else {
-      records.removeAt(0);
       records.add(content);
+      records = records.skip(records.length - kLogFileLength).toList();
 
       logFile.writeAsStringSync(records.join('\n'));
     }
