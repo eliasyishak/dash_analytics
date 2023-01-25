@@ -13,6 +13,7 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
+import 'package:dash_analytics/src/enums.dart';
 import 'package:dash_analytics/src/session.dart';
 import 'package:dash_analytics/src/user_property.dart';
 import 'package:dash_analytics/src/utils.dart';
