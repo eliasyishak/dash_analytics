@@ -12,7 +12,7 @@ final String apiSecret = '4yT8__oER3Cd84dtx6r-_A';
 // Globally instantiate the analytics class at the entry
 // point of the tool
 final Analytics analytics = Analytics(
-  tool: tool,
+  tool: DashTools.flutterTools,
   measurementId: measurementId,
   apiSecret: apiSecret,
   branch: 'ey-test-branch',
@@ -25,16 +25,10 @@ void main() {
   print('###### START ###### $start');
 
   print(analytics.telemetryEnabled);
-  DateTime begin;
-  // TODO: remove this code after PR is completed
-  for (int i = 0; i < 500; i++) {
-    begin = DateTime.now();
-    analytics.sendEvent(
-      eventName: DashEvents.hotReloadTime,
-      eventData: <String, int>{'time_ns': i},
-    );
-    print('${DateTime.now().difference(begin).inMicroseconds}');
-  }
+  analytics.sendEvent(
+    eventName: DashEvents.hotReloadTime,
+    eventData: <String, int>{'time_ns': 345},
+  );
   analytics.close();
 
   DateTime end = DateTime.now();
