@@ -3,4 +3,4 @@
 // found in the LICENSE file.
 
 export 'src/analytics.dart' show Analytics;
-export 'src/enums.dart' show DashEvents, DashTools, LogFileQuery;
+export 'src/enums.dart';
