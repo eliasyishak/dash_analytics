@@ -686,4 +686,34 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(logFile.readAsLinesSync().length, kLogFileLength,
         reason: 'The number of events should be capped at $kLogFileLength');
   });
+
+  test('Check the sessionCount query works as expected', () {
+    analytics.sendEvent(
+        eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+
+    final Map<String, dynamic> firstQuery =
+        analytics.query(LogFileQuery.sessionCount);
+    expect(firstQuery.containsKey('session_count'), true,
+        reason: 'The session_count variable should have been returned');
+    expect(firstQuery['session_count'], 1,
+        reason:
+            'There should only be one session after the initial send event');
+
+    // Define a new clock that is outside of the session duration
+    final DateTime firstClock =
+        clock.now().add(Duration(minutes: kSessionDurationMinutes + 1));
+
+    // Use the new clock to send an event that will change the session identifier
+    withClock(Clock.fixed(firstClock), () {
+      analytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+    });
+
+    final Map<String, dynamic> secondQuery =
+        analytics.query(LogFileQuery.sessionCount);
+    expect(secondQuery.containsKey('session_count'), true,
+        reason: 'The session_count variable should have been returned');
+    expect(secondQuery['session_count'], 2,
+        reason: 'There should be 2 sessions after the second event');
+  });
 }
