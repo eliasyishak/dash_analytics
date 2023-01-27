@@ -32,7 +32,10 @@ enum DashTools {
     label: 'flutter-tools',
     description: 'Runs flutter applications from CLI',
   ),
-  ;
+  dartAnalyzer(
+    label: 'dart-analyzer',
+    description: 'Analyzes dart code in workspace',
+  );
 
   final String label;
   final String description;

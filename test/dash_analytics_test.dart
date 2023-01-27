@@ -645,4 +645,21 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         (body['events'][0] as Map<String, dynamic>).containsKey('params'), true,
         reason: 'Each event in the events array needs a params key');
   });
+
+  test(
+      'All DashTools labels are made of characters that are letters or hyphens',
+      () {
+    // Regex pattern to match only letters or hyphens
+    final RegExp toolLabelPattern = RegExp(r'^[a-zA-Z\-]+$');
+    bool valid = true;
+    for (DashTools tool in DashTools.values) {
+      if (!toolLabelPattern.hasMatch(tool.label)) {
+        valid = false;
+      }
+    }
+
+    expect(valid, true,
+        reason: 'All tool labels should have letters and hyphens '
+            'as a delimiter if needed');
+  });
 }
