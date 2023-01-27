@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 import 'dart:io' as io;
+import 'dart:math';
 
 import 'package:clock/clock.dart';
 import 'package:file/file.dart';
@@ -13,7 +14,6 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
-import 'package:dash_analytics/src/enums.dart';
 import 'package:dash_analytics/src/session.dart';
 import 'package:dash_analytics/src/user_property.dart';
 import 'package:dash_analytics/src/utils.dart';
@@ -554,6 +554,9 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       expect(secondAnalytics.userPropertyMap['session_id']?['value'],
           start.millisecondsSinceEpoch);
       expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
+
+      secondAnalytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
     });
 
     // Add time to the start time that is less than the duration
@@ -661,5 +664,26 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(valid, true,
         reason: 'All tool labels should have letters and hyphens '
             'as a delimiter if needed');
+  });
+
+  test('Check that log file is correctly persisting events sent', () {
+    final int numberOfEvents = max((kLogFileLength * 0.1).floor(), 5);
+
+    for (int i = 0; i < numberOfEvents; i++) {
+      analytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+    }
+
+    expect(logFile.readAsLinesSync().length, numberOfEvents,
+        reason: 'The number of events should be $numberOfEvents');
+
+    // Add the max number of events to confirm it does not exceed the max
+    for (int i = 0; i < kLogFileLength; i++) {
+      analytics.sendEvent(
+          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+    }
+
+    expect(logFile.readAsLinesSync().length, kLogFileLength,
+        reason: 'The number of events should be capped at $kLogFileLength');
   });
 }

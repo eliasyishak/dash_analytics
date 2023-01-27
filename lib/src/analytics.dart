@@ -296,12 +296,14 @@ class TestAnalytics extends AnalyticsImpl {
     // Calling the [generateRequestBody] method will ensure that the
     // session file is getting updated without actually making any
     // POST requests to Google Analytics
-    generateRequestBody(
+    final Map<String, dynamic> body = generateRequestBody(
       clientId: _clientId,
       eventName: eventName,
       eventData: eventData,
       userProperty: userProperty,
     );
+
+    _logHandler.save(data: body);
 
     return null;
   }
