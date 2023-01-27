@@ -47,6 +47,9 @@ class LogHandler {
   }
 
   /// Query the persisted log file using the persisted log file
+  ///
+  /// [q] is the type of query to make, the list of queries is enumerated
+  /// in [LogFileQuery]
   Map<String, dynamic> query(LogFileQuery q) {
     Iterable<Map<String, dynamic>> records =
         logFile.readAsLinesSync().map((String e) => jsonDecode(e));
