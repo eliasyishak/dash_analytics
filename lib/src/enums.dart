@@ -58,7 +58,7 @@ enum DevicePlatform {
 
 // Supported queries on the persisted log file
 enum LogFileQuery {
-  /// Returns the unique number of sessions along with how the start
+  /// Returns the unique number of sessions along with the start
   /// and end dates for the entire log file
   sessionCount,
   ;
