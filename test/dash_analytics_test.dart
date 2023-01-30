@@ -14,7 +14,6 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
-import 'package:dash_analytics/src/log_handler.dart';
 import 'package:dash_analytics/src/session.dart';
 import 'package:dash_analytics/src/user_property.dart';
 import 'package:dash_analytics/src/utils.dart';
@@ -689,10 +688,13 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
   });
 
   test('Check the sessionCount query works as expected', () {
+    expect(analytics.logFileStats(), isNull,
+        reason: 'The result for the log file stats should be null when '
+            'there are no logs');
     analytics.sendEvent(
         eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
 
-    final LogFileStats firstQuery = analytics.logFileStats();
+    final LogFileStats firstQuery = analytics.logFileStats()!;
     expect(firstQuery.sessionCount, 1,
         reason:
             'There should only be one session after the initial send event');
@@ -707,7 +709,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
           eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
     });
 
-    final LogFileStats secondQuery = analytics.logFileStats();
+    final LogFileStats secondQuery = analytics.logFileStats()!;
     expect(secondQuery.sessionCount, 2,
         reason: 'There should be 2 sessions after the second event');
   });

@@ -120,7 +120,9 @@ abstract class Analytics {
   void close();
 
   /// Query the persisted event data stored on the user's machine
-  LogFileStats logFileStats();
+  ///
+  /// Returns null if there are no persisted logs
+  LogFileStats? logFileStats();
 
   /// API to send events to Google Analytics to track usage
   Future<Response>? sendEvent({
@@ -236,7 +238,7 @@ class AnalyticsImpl implements Analytics {
   void close() => _gaClient.close();
 
   @override
-  LogFileStats logFileStats() => _logHandler.logFileStats();
+  LogFileStats? logFileStats() => _logHandler.logFileStats();
 
   @override
   Future<Response>? sendEvent({

@@ -24,7 +24,7 @@ class LogFileStats {
   });
 
   @override
-  String toString() => jsonEncode({
+  String toString() => jsonEncode(<String, dynamic>{
         'startDateTime': startDateTime.toString(),
         'endDateTime': endDateTime.toString(),
         'sessionCount': sessionCount,
@@ -51,9 +51,11 @@ class LogHandler {
         ));
 
   /// Get stats from the persisted log file
-  LogFileStats logFileStats() {
+  LogFileStats? logFileStats() {
     Iterable<Map<String, dynamic>> records =
         logFile.readAsLinesSync().map((String e) => jsonDecode(e));
+
+    if (records.isEmpty) return null;
 
     // Get the start and end dates for the log file
     final DateTime startDateTime =
