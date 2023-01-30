@@ -55,11 +55,3 @@ enum DevicePlatform {
   final String label;
   const DevicePlatform(this.label);
 }
-
-// Supported queries on the persisted log file
-enum LogFileQuery {
-  /// Returns the unique number of sessions along with the start
-  /// and end dates for the entire log file
-  sessionCount,
-  ;
-}

@@ -4,7 +4,6 @@ import 'package:file/file.dart';
 import 'package:path/path.dart' as p;
 
 import 'constants.dart';
-import 'enums.dart';
 import 'initializer.dart';
 
 class LogHandler {
@@ -46,31 +45,46 @@ class LogHandler {
     }
   }
 
-  /// Query the persisted log file using the persisted log file
-  ///
-  /// [q] is the type of query to make, the list of queries is enumerated
-  /// in [LogFileQuery]
-  Map<String, dynamic> query(LogFileQuery q) {
+  /// Get stats from the persisted log file
+  LogFileStats logFileStats() {
     Iterable<Map<String, dynamic>> records =
         logFile.readAsLinesSync().map((String e) => jsonDecode(e));
-    Map<String, dynamic> results = <String, dynamic>{};
 
     // Get the start and end dates for the log file
-    results['start_datetime'] =
+    final DateTime startDateTime =
         DateTime.parse(records.first['user_properties']['local_time']['value']);
-    results['end_datetime'] =
+    final DateTime endDateTime =
         DateTime.parse(records.last['user_properties']['local_time']['value']);
 
-    switch (q) {
-      case LogFileQuery.sessionCount:
-        final Set<int> sessions = <int>{};
-        for (Map<String, dynamic> element in records) {
-          sessions.add(element['user_properties']['session_id']['value']);
-        }
-        results['session_count'] = sessions.length;
-        break;
+    // Collection of unique sessions
+    final Set<int> sessions = <int>{};
+    for (Map<String, dynamic> element in records) {
+      sessions.add(element['user_properties']['session_id']['value']);
     }
+    final int sessionCount = sessions.length;
 
-    return results;
+    return LogFileStats(
+      startDateTime: startDateTime,
+      endDateTime: endDateTime,
+      sessionCount: sessionCount,
+    );
   }
+}
+
+class LogFileStats {
+  /// The oldest timestamp in the log file
+  final DateTime startDateTime;
+
+  /// The latest timestamp in the log file
+  final DateTime endDateTime;
+
+  /// The number of unique session ids found in the log file
+  final int sessionCount;
+
+  /// Contains the data from the [LogHandler.logFileStats]
+  LogFileStats({
+    required this.startDateTime,
+    required this.endDateTime,
+    required this.sessionCount,
+  });
 }

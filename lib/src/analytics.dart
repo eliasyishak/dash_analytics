@@ -120,7 +120,7 @@ abstract class Analytics {
   void close();
 
   /// Query the persisted event data stored on the user's machine
-  Map<String, dynamic> query(LogFileQuery q);
+  LogFileStats logFileStats();
 
   /// API to send events to Google Analytics to track usage
   Future<Response>? sendEvent({
@@ -236,7 +236,7 @@ class AnalyticsImpl implements Analytics {
   void close() => _gaClient.close();
 
   @override
-  Map<String, dynamic> query(LogFileQuery q) => _logHandler.query(q);
+  LogFileStats logFileStats() => _logHandler.logFileStats();
 
   @override
   Future<Response>? sendEvent({
@@ -256,8 +256,7 @@ class AnalyticsImpl implements Analytics {
     _logHandler.save(data: body);
 
     // Pass to the google analytics client to send
-    // return _gaClient.sendData(body); TODO: uncomment once log handler is complete
-    return null;
+    return _gaClient.sendData(body);
   }
 
   @override

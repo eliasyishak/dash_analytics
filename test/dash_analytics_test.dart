@@ -14,6 +14,7 @@ import 'package:test/test.dart';
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
 import 'package:dash_analytics/src/constants.dart';
+import 'package:dash_analytics/src/log_handler.dart';
 import 'package:dash_analytics/src/session.dart';
 import 'package:dash_analytics/src/user_property.dart';
 import 'package:dash_analytics/src/utils.dart';
@@ -691,11 +692,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     analytics.sendEvent(
         eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
 
-    final Map<String, dynamic> firstQuery =
-        analytics.query(LogFileQuery.sessionCount);
-    expect(firstQuery.containsKey('session_count'), true,
-        reason: 'The session_count variable should have been returned');
-    expect(firstQuery['session_count'], 1,
+    final LogFileStats firstQuery = analytics.logFileStats();
+    expect(firstQuery.sessionCount, 1,
         reason:
             'There should only be one session after the initial send event');
 
@@ -709,11 +707,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
           eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
     });
 
-    final Map<String, dynamic> secondQuery =
-        analytics.query(LogFileQuery.sessionCount);
-    expect(secondQuery.containsKey('session_count'), true,
-        reason: 'The session_count variable should have been returned');
-    expect(secondQuery['session_count'], 2,
+    final LogFileStats secondQuery = analytics.logFileStats();
+    expect(secondQuery.sessionCount, 2,
         reason: 'There should be 2 sessions after the second event');
   });
 }
