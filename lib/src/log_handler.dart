@@ -22,6 +22,13 @@ class LogFileStats {
     required this.endDateTime,
     required this.sessionCount,
   });
+
+  @override
+  String toString() => jsonEncode({
+        'startDateTime': startDateTime.toString(),
+        'endDateTime': endDateTime.toString(),
+        'sessionCount': sessionCount,
+      });
 }
 
 class LogHandler {
