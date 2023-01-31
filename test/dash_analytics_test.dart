@@ -655,7 +655,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     // Regex pattern to match only letters or hyphens
     final RegExp toolLabelPattern = RegExp(r'^[a-zA-Z\-]+$');
     bool valid = true;
-    for (DashTools tool in DashTools.values) {
+    for (DashTool tool in DashTool.values) {
       if (!toolLabelPattern.hasMatch(tool.label)) {
         valid = false;
       }

@@ -12,7 +12,7 @@ final String apiSecret = '4yT8__oER3Cd84dtx6r-_A';
 // Globally instantiate the analytics class at the entry
 // point of the tool
 final Analytics analytics = Analytics(
-  tool: DashTools.flutterTools,
+  tool: DashTool.flutterTools,
   measurementId: measurementId,
   apiSecret: apiSecret,
   branch: 'ey-test-branch',

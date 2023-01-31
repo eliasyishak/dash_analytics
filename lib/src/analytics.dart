@@ -24,7 +24,7 @@ abstract class Analytics {
   /// The default factory constructor that will return an implementation
   /// of the [Analytics] abstract class using the [LocalFileSystem]
   factory Analytics({
-    required DashTools tool,
+    required DashTool tool,
     required String measurementId,
     required String apiSecret,
     required String branch,

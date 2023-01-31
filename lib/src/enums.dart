@@ -10,13 +10,13 @@ enum DashEvents {
   hotReloadTime(
     label: 'hot_reload_time',
     description: 'Hot reload duration',
-    toolOwner: DashTools.flutterTools,
+    toolOwner: DashTool.flutterTools,
   ),
   ;
 
   final String label;
   final String description;
-  final DashTools toolOwner;
+  final DashTool toolOwner;
   const DashEvents({
     required this.label,
     required this.description,
@@ -27,7 +27,7 @@ enum DashEvents {
 /// The tools that have been onboarded
 ///
 /// All tools should use a hyphen as a delimiter
-enum DashTools {
+enum DashTool {
   flutterTools(
     label: 'flutter-tools',
     description: 'Runs flutter applications from CLI',
@@ -39,7 +39,7 @@ enum DashTools {
 
   final String label;
   final String description;
-  const DashTools({
+  const DashTool({
     required this.label,
     required this.description,
   });
