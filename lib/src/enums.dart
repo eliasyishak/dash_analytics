@@ -24,9 +24,9 @@ enum DashEvents {
   });
 }
 
-/// The tools that have been onboarded
+/// Officially-supported clients of this package.
 ///
-/// All tools should use a hyphen as a delimiter
+/// All [label] values should use a hyphen as a delimiter
 enum DashTool {
   flutterTools(
     label: 'flutter-tools',
