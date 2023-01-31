@@ -16,8 +16,8 @@ class LogFileStats {
   /// The number of unique session ids found in the log file
   final int sessionCount;
 
-  /// Contains the data from the [LogHandler.logFileStats]
-  LogFileStats({
+  /// Contains the data from the [LogHandler.logFileStats] method
+  const LogFileStats({
     required this.startDateTime,
     required this.endDateTime,
     required this.sessionCount,
