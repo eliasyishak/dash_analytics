@@ -111,7 +111,7 @@ abstract class Analytics {
   /// Returns a map representation of the [UserProperty] for the [Analytics] instance
   ///
   /// This is what will get sent to Google Analytics with every request
-  Map<String, Map<String, dynamic>> get userPropertyMap;
+  Map<String, Map<String, Object?>> get userPropertyMap;
 
   /// Call this method when the tool using this package is closed
   ///
@@ -127,7 +127,7 @@ abstract class Analytics {
   /// API to send events to Google Analytics to track usage
   Future<Response>? sendEvent({
     required DashEvents eventName,
-    required Map<String, dynamic> eventData,
+    required Map<String, Object?> eventData,
   });
 
   /// Pass a boolean to either enable or disable telemetry and make
@@ -231,7 +231,7 @@ class AnalyticsImpl implements Analytics {
   bool get telemetryEnabled => _configHandler.telemetryEnabled;
 
   @override
-  Map<String, Map<String, dynamic>> get userPropertyMap =>
+  Map<String, Map<String, Object?>> get userPropertyMap =>
       userProperty.preparePayload();
 
   @override
@@ -243,12 +243,12 @@ class AnalyticsImpl implements Analytics {
   @override
   Future<Response>? sendEvent({
     required DashEvents eventName,
-    required Map<String, dynamic> eventData,
+    required Map<String, Object?> eventData,
   }) {
     if (!telemetryEnabled) return null;
 
     // Construct the body of the request
-    final Map<String, dynamic> body = generateRequestBody(
+    final Map<String, Object?> body = generateRequestBody(
       clientId: _clientId,
       eventName: eventName,
       eventData: eventData,
@@ -290,14 +290,14 @@ class TestAnalytics extends AnalyticsImpl {
   @override
   Future<Response>? sendEvent({
     required DashEvents eventName,
-    required Map<String, dynamic> eventData,
+    required Map<String, Object?> eventData,
   }) {
     if (!telemetryEnabled) return null;
 
     // Calling the [generateRequestBody] method will ensure that the
     // session file is getting updated without actually making any
     // POST requests to Google Analytics
-    final Map<String, dynamic> body = generateRequestBody(
+    final Map<String, Object?> body = generateRequestBody(
       clientId: _clientId,
       eventName: eventName,
       eventData: eventData,
