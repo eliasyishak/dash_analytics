@@ -6,7 +6,7 @@
 ///
 /// The [label] for each enum value is what will be logged, the [description]
 /// is here for documentation purposes
-enum DashEvents {
+enum DashEvent {
   hotReloadTime(
     label: 'hot_reload_time',
     description: 'Hot reload duration',
@@ -17,7 +17,7 @@ enum DashEvents {
   final String label;
   final String description;
   final DashTool toolOwner;
-  const DashEvents({
+  const DashEvent({
     required this.label,
     required this.description,
     required this.toolOwner,

@@ -504,7 +504,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       // getting updated but because we use the `Analytics.test()` constructor
       // no events will be sent
       thirdAnalytics.sendEvent(
-          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+          eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
@@ -556,7 +556,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       expect(sessionObj['last_ping'], start.millisecondsSinceEpoch);
 
       secondAnalytics.sendEvent(
-          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+          eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
     });
 
     // Add time to the start time that is less than the duration
@@ -586,7 +586,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       // getting updated but because we use the `Analytics.test()` constructor
       // no events will be sent
       thirdAnalytics.sendEvent(
-          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+          eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
 
       // Read the contents of the session file
       final String sessionFileContents = sessionFile.readAsStringSync();
@@ -618,7 +618,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
 
     final Map<String, dynamic> body = generateRequestBody(
       clientId: Uuid().generateV4(),
-      eventName: DashEvents.hotReloadTime,
+      eventName: DashEvent.hotReloadTime,
       eventData: eventData,
       userProperty: userProperty,
     );
@@ -671,7 +671,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
 
     for (int i = 0; i < numberOfEvents; i++) {
       analytics.sendEvent(
-          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+          eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
     }
 
     expect(logFile.readAsLinesSync().length, numberOfEvents,
@@ -680,7 +680,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     // Add the max number of events to confirm it does not exceed the max
     for (int i = 0; i < kLogFileLength; i++) {
       analytics.sendEvent(
-          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+          eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
     }
 
     expect(logFile.readAsLinesSync().length, kLogFileLength,
@@ -692,7 +692,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         reason: 'The result for the log file stats should be null when '
             'there are no logs');
     analytics.sendEvent(
-        eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+        eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
 
     final LogFileStats firstQuery = analytics.logFileStats()!;
     expect(firstQuery.sessionCount, 1,
@@ -706,7 +706,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     // Use the new clock to send an event that will change the session identifier
     withClock(Clock.fixed(firstClock), () {
       analytics.sendEvent(
-          eventName: DashEvents.hotReloadTime, eventData: <String, dynamic>{});
+          eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
     });
 
     final LogFileStats secondQuery = analytics.logFileStats()!;

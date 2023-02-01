@@ -33,7 +33,7 @@ import 'user_property.dart';
 /// https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag
 Map<String, dynamic> generateRequestBody({
   required String clientId,
-  required DashEvents eventName,
+  required DashEvent eventName,
   required Map<String, dynamic> eventData,
   required UserProperty userProperty,
 }) =>
