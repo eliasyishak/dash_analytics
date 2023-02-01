@@ -34,7 +34,7 @@ class LogFileStats {
   });
 
   @override
-  String toString() => jsonEncode(<String, dynamic>{
+  String toString() => jsonEncode(<String, Object?>{
         'startDateTime': startDateTime.toString(),
         'endDateTime': endDateTime.toString(),
         'sessionCount': sessionCount,
@@ -106,7 +106,7 @@ class LogHandler {
   ///
   /// This will keep the max number of records limited to equal to
   /// or less than [kLogFileLength] records
-  void save({required Map<String, dynamic> data}) {
+  void save({required Map<String, Object?> data}) {
     List<String> records = logFile.readAsLinesSync();
     final String content = '${jsonEncode(data)}\n';
 
@@ -189,7 +189,7 @@ class LogItem {
   ///     }
   /// }
   /// ```
-  static LogItem? fromRecord(Map<String, dynamic> record) {
+  static LogItem? fromRecord(Map<String, Object?> record) {
     if (!record.containsKey('user_properties')) return null;
 
     // Using a try/except here to parse out the fields if possible,
@@ -197,28 +197,53 @@ class LogItem {
     // downstream
     try {
       // Parse the data out of the `user_properties` value
-      final Map<String, dynamic> userProps = record['user_properties'];
+      final Map<String, Object?> userProps =
+          record['user_properties'] as Map<String, Object?>;
 
       // Parse out the values from the top level key = 'user_properties`
-      final int sessionId = userProps['session_id']['value'];
-      final String branch = userProps['branch']['value'];
-      final String host = userProps['host']['value'];
-      final String flutterVersion = userProps['flutter_version']['value'];
-      final String dartVersion = userProps['dart_version']['value'];
-      final String tool = userProps['tool']['value'];
-      final DateTime localTime =
-          DateTime.parse(userProps['local_time']['value']);
+      final int? sessionId =
+          (userProps['session_id']! as Map<String, Object?>)['value'] as int?;
+      final String? branch =
+          (userProps['branch']! as Map<String, Object?>)['value'] as String?;
+      final String? host =
+          (userProps['host']! as Map<String, Object?>)['value'] as String?;
+      final String? flutterVersion = (userProps['flutter_version']!
+          as Map<String, Object?>)['value'] as String?;
+      final String? dartVersion = (userProps['dart_version']!
+          as Map<String, Object?>)['value'] as String?;
+      final String? tool =
+          (userProps['tool']! as Map<String, Object?>)['value'] as String?;
+      final String? localTimeString = (userProps['local_time']!
+          as Map<String, Object?>)['value'] as String?;
+
+      // If any of the above values are null, return null since that
+      // indicates the record is malformed
+      final List<Object?> values = <Object?>[
+        sessionId,
+        branch,
+        host,
+        flutterVersion,
+        dartVersion,
+        tool,
+        localTimeString,
+      ];
+      for (Object? value in values) {
+        if (value == null) return null;
+      }
+
+      // Parse the local time from the string extracted
+      final DateTime localTime = DateTime.parse(localTimeString!);
 
       return LogItem(
-        sessionId: sessionId,
-        branch: branch,
-        host: host,
-        flutterVersion: flutterVersion,
-        dartVersion: dartVersion,
-        tool: tool,
+        sessionId: sessionId!,
+        branch: branch!,
+        host: host!,
+        flutterVersion: flutterVersion!,
+        dartVersion: dartVersion!,
+        tool: tool!,
         localTime: localTime,
       );
-    } catch (e) {
+    } on Exception {
       return null;
     }
   }
