@@ -6,6 +6,8 @@ import 'package:path/path.dart' as p;
 import 'constants.dart';
 import 'initializer.dart';
 
+/// Data class that will be returned when analyzing the
+/// persisted log file on the client's machine
 class LogFileStats {
   /// The oldest timestamp in the log file
   final DateTime startDateTime;
@@ -16,11 +18,19 @@ class LogFileStats {
   /// The number of unique session ids found in the log file
   final int sessionCount;
 
+  /// The number of unique branches found in the log file
+  final int branchCount;
+
+  /// The number of unique tools found in the log file
+  final int toolCount;
+
   /// Contains the data from the [LogHandler.logFileStats] method
   const LogFileStats({
     required this.startDateTime,
     required this.endDateTime,
     required this.sessionCount,
+    required this.branchCount,
+    required this.toolCount,
   });
 
   @override
@@ -28,6 +38,8 @@ class LogFileStats {
         'startDateTime': startDateTime.toString(),
         'endDateTime': endDateTime.toString(),
         'sessionCount': sessionCount,
+        'branchCount': branchCount,
+        'toolCount': toolCount,
       });
 }
 
@@ -54,28 +66,39 @@ class LogHandler {
 
   /// Get stats from the persisted log file
   LogFileStats? logFileStats() {
-    Iterable<Map<String, dynamic>> records =
-        logFile.readAsLinesSync().map((String e) => jsonDecode(e));
+    // Parse each line of the log file through [LogItem],
+    // some returned records may be null if malformed, they will be
+    // removed later through `whereType<LogItem>`
+    final List<LogItem> records = logFile
+        .readAsLinesSync()
+        .map((String e) => LogItem.fromRecord(jsonDecode(e)))
+        .whereType<LogItem>()
+        .toList();
 
     if (records.isEmpty) return null;
 
     // Get the start and end dates for the log file
-    final DateTime startDateTime =
-        DateTime.parse(records.first['user_properties']['local_time']['value']);
-    final DateTime endDateTime =
-        DateTime.parse(records.last['user_properties']['local_time']['value']);
+    final DateTime startDateTime = records.first.localTime;
+    final DateTime endDateTime = records.last.localTime;
 
     // Collection of unique sessions
-    final Set<int> sessions = <int>{};
-    for (Map<String, dynamic> element in records) {
-      sessions.add(element['user_properties']['session_id']['value']);
+    final Map<String, Set<Object>> counter = <String, Set<Object>>{
+      'sessions': <int>{},
+      'branch': <String>{},
+      'tool': <String>{},
+    };
+    for (LogItem record in records) {
+      counter['sessions']!.add(record.sessionId);
+      counter['branch']!.add(record.branch);
+      counter['tool']!.add(record.tool);
     }
-    final int sessionCount = sessions.length;
 
     return LogFileStats(
       startDateTime: startDateTime,
       endDateTime: endDateTime,
-      sessionCount: sessionCount,
+      sessionCount: counter['sessions']!.length,
+      branchCount: counter['branch']!.length,
+      toolCount: counter['tool']!.length,
     );
   }
 
@@ -96,6 +119,107 @@ class LogHandler {
       records = records.skip(records.length - kLogFileLength).toList();
 
       logFile.writeAsStringSync(records.join('\n'));
+    }
+  }
+}
+
+/// Data class for each record persisted on the client's machine
+class LogItem {
+  final int sessionId;
+  final String branch;
+  final String host;
+  final String flutterVersion;
+  final String dartVersion;
+  final String tool;
+  final DateTime localTime;
+
+  LogItem({
+    required this.sessionId,
+    required this.branch,
+    required this.host,
+    required this.flutterVersion,
+    required this.dartVersion,
+    required this.tool,
+    required this.localTime,
+  });
+
+  /// Serves a parser for each record in the log file
+  ///
+  /// Using this method guarantees that we have parsed out
+  /// fields that are necessary for the [LogHandler.logFileStats]
+  /// method
+  ///
+  /// If the returned value is [null], that indicates a malformed
+  /// record which can be discarded during analysis
+  ///
+  /// Example of what a record looks like:
+  /// ```
+  /// {
+  ///     "client_id": "d40133a0-7ea6-4347-b668-ffae94bb8774",
+  ///     "events": [
+  ///         {
+  ///             "name": "hot_reload_time",
+  ///             "params": {
+  ///                 "time_ns": 345
+  ///             }
+  ///         }
+  ///     ],
+  ///     "user_properties": {
+  ///         "session_id": {
+  ///             "value": 1675193534342
+  ///         },
+  ///         "branch": {
+  ///             "value": "ey-test-branch"
+  ///         },
+  ///         "host": {
+  ///             "value": "macOS"
+  ///         },
+  ///         "flutter_version": {
+  ///             "value": "Flutter 3.6.0-7.0.pre.47"
+  ///         },
+  ///         "dart_version": {
+  ///             "value": "Dart 2.19.0"
+  ///         },
+  ///         "tool": {
+  ///             "value": "flutter-tools"
+  ///         },
+  ///         "local_time": {
+  ///             "value": "2023-01-31 14:32:14.592898"
+  ///         }
+  ///     }
+  /// }
+  /// ```
+  static LogItem? fromRecord(Map<String, dynamic> record) {
+    if (!record.containsKey('user_properties')) return null;
+
+    // Using a try/except here to parse out the fields if possible,
+    // if not, it will quietly return null and won't get processed
+    // downstream
+    try {
+      // Parse the data out of the `user_properties` value
+      final Map<String, dynamic> userProps = record['user_properties'];
+
+      // Parse out the values from the top level key = 'user_properties`
+      final int sessionId = userProps['session_id']['value'];
+      final String branch = userProps['branch']['value'];
+      final String host = userProps['host']['value'];
+      final String flutterVersion = userProps['flutter_version']['value'];
+      final String dartVersion = userProps['dart_version']['value'];
+      final String tool = userProps['tool']['value'];
+      final DateTime localTime =
+          DateTime.parse(userProps['local_time']['value']);
+
+      return LogItem(
+        sessionId: sessionId,
+        branch: branch,
+        host: host,
+        flutterVersion: flutterVersion,
+        dartVersion: dartVersion,
+        tool: tool,
+        localTime: localTime,
+      );
+    } catch (e) {
+      return null;
     }
   }
 }

@@ -687,7 +687,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         reason: 'The number of events should be capped at $kLogFileLength');
   });
 
-  test('Check the sessionCount query works as expected', () {
+  test('Check the query on the log file works as expected', () {
     expect(analytics.logFileStats(), isNull,
         reason: 'The result for the log file stats should be null when '
             'there are no logs');
@@ -698,6 +698,10 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(firstQuery.sessionCount, 1,
         reason:
             'There should only be one session after the initial send event');
+    expect(firstQuery.branchCount, 1,
+        reason: 'There should only be one branch logged');
+    expect(firstQuery.toolCount, 1,
+        reason: 'There should only be one tool logged');
 
     // Define a new clock that is outside of the session duration
     final DateTime firstClock =
@@ -712,5 +716,33 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     final LogFileStats secondQuery = analytics.logFileStats()!;
     expect(secondQuery.sessionCount, 2,
         reason: 'There should be 2 sessions after the second event');
+  });
+
+  test('Check that the log file shows two different tools being used', () {
+    final Analytics secondAnalytics = Analytics.test(
+      tool: secondTool,
+      homeDirectory: home,
+      measurementId: 'measurementId',
+      apiSecret: 'apiSecret',
+      branch: 'ey-test-branch',
+      toolsMessageVersion: toolsMessageVersion,
+      toolsMessage: toolsMessage,
+      flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+      dartVersion: 'Dart 2.19.0',
+      fs: fs,
+      platform: platform,
+    );
+
+    // Send events with both instances of the classes
+    analytics.sendEvent(
+        eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
+    secondAnalytics.sendEvent(
+        eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
+
+    // Query the log file stats to verify that there are two tools
+    LogFileStats? query = analytics.logFileStats();
+
+    expect(query!.toolCount, 2,
+        reason: 'There should have been two tools in the persisted logs');
   });
 }
