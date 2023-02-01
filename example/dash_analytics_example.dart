@@ -4,8 +4,6 @@
 
 import 'package:dash_analytics/dash_analytics.dart';
 
-final String tool = 'flutter-tools';
-
 final String measurementId = 'G-N1NXG28J5B';
 final String apiSecret = '4yT8__oER3Cd84dtx6r-_A';
 
