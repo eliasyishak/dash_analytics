@@ -26,7 +26,7 @@ class GAClient {
 
   /// Receive the payload in Map form and parse
   /// into JSON to send to GA
-  Future<http.Response> sendData(Map<String, dynamic> body) {
+  Future<http.Response> sendData(Map<String, Object?> body) {
     return _client.post(
       Uri.parse(postUrl),
       headers: <String, String>{

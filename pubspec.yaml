@@ -1,6 +1,6 @@
 name: dash_analytics
 description: A package for logging analytics for all dash related tooling to Google Analytics
-version: 1.0.0
+version: 0.0.1
 # repository: https://github.com/my_org/my_repo
 
 environment:

@@ -15,6 +15,7 @@ import 'constants.dart';
 import 'enums.dart';
 import 'ga_client.dart';
 import 'initializer.dart';
+import 'log_handler.dart';
 import 'session.dart';
 import 'user_property.dart';
 import 'utils.dart';
@@ -23,7 +24,7 @@ abstract class Analytics {
   /// The default factory constructor that will return an implementation
   /// of the [Analytics] abstract class using the [LocalFileSystem]
   factory Analytics({
-    required String tool,
+    required DashTool tool,
     required String measurementId,
     required String apiSecret,
     required String branch,
@@ -45,7 +46,7 @@ abstract class Analytics {
     }
 
     return AnalyticsImpl(
-      tool: tool,
+      tool: tool.label,
       homeDirectory: getHomeDirectory(fs),
       measurementId: measurementId,
       apiSecret: apiSecret,
@@ -110,7 +111,7 @@ abstract class Analytics {
   /// Returns a map representation of the [UserProperty] for the [Analytics] instance
   ///
   /// This is what will get sent to Google Analytics with every request
-  Map<String, Map<String, dynamic>> get userPropertyMap;
+  Map<String, Map<String, Object?>> get userPropertyMap;
 
   /// Call this method when the tool using this package is closed
   ///
@@ -118,10 +119,15 @@ abstract class Analytics {
   /// that need to be sent off
   void close();
 
+  /// Query the persisted event data stored on the user's machine
+  ///
+  /// Returns null if there are no persisted logs
+  LogFileStats? logFileStats();
+
   /// API to send events to Google Analytics to track usage
   Future<Response>? sendEvent({
-    required DashEvents eventName,
-    required Map<String, dynamic> eventData,
+    required DashEvent eventName,
+    required Map<String, Object?> eventData,
   });
 
   /// Pass a boolean to either enable or disable telemetry and make
@@ -136,6 +142,7 @@ class AnalyticsImpl implements Analytics {
   late final GAClient _gaClient;
   late final String _clientId;
   late final UserProperty userProperty;
+  late final LogHandler _logHandler;
 
   @override
   final String toolsMessage;
@@ -209,6 +216,9 @@ class AnalyticsImpl implements Analytics {
       dartVersion: dartVersion,
       tool: tool,
     );
+
+    // Initialize the log handler to persist events that are being sent
+    _logHandler = LogHandler(fs: fs, homeDirectory: homeDirectory);
   }
 
   @override
@@ -221,33 +231,39 @@ class AnalyticsImpl implements Analytics {
   bool get telemetryEnabled => _configHandler.telemetryEnabled;
 
   @override
-  Map<String, Map<String, dynamic>> get userPropertyMap =>
+  Map<String, Map<String, Object?>> get userPropertyMap =>
       userProperty.preparePayload();
 
   @override
   void close() => _gaClient.close();
 
   @override
+  LogFileStats? logFileStats() => _logHandler.logFileStats();
+
+  @override
   Future<Response>? sendEvent({
-    required DashEvents eventName,
-    required Map<String, dynamic> eventData,
+    required DashEvent eventName,
+    required Map<String, Object?> eventData,
   }) {
     if (!telemetryEnabled) return null;
 
     // Construct the body of the request
-    final Map<String, dynamic> body = generateRequestBody(
+    final Map<String, Object?> body = generateRequestBody(
       clientId: _clientId,
       eventName: eventName,
       eventData: eventData,
       userProperty: userProperty,
     );
 
+    _logHandler.save(data: body);
+
     // Pass to the google analytics client to send
     return _gaClient.sendData(body);
   }
 
   @override
-  Future<void> setTelemetry(bool reportingBool) => _configHandler.setTelemetry(reportingBool);
+  Future<void> setTelemetry(bool reportingBool) =>
+      _configHandler.setTelemetry(reportingBool);
 }
 
 /// This class extends [AnalyticsImpl] and subs out any methods that
@@ -273,20 +289,22 @@ class TestAnalytics extends AnalyticsImpl {
 
   @override
   Future<Response>? sendEvent({
-    required DashEvents eventName,
-    required Map<String, dynamic> eventData,
+    required DashEvent eventName,
+    required Map<String, Object?> eventData,
   }) {
     if (!telemetryEnabled) return null;
 
     // Calling the [generateRequestBody] method will ensure that the
     // session file is getting updated without actually making any
     // POST requests to Google Analytics
-    generateRequestBody(
+    final Map<String, Object?> body = generateRequestBody(
       clientId: _clientId,
       eventName: eventName,
       eventData: eventData,
       userProperty: userProperty,
     );
+
+    _logHandler.save(data: body);
 
     return null;
   }

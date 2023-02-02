@@ -229,7 +229,7 @@ class ToolInfo {
 
   @override
   String toString() {
-    return json.encode(<String, dynamic>{
+    return json.encode(<String, Object?>{
       'lastRun': DateFormat('yyyy-MM-dd').format(lastRun),
       'versionNumber': versionNumber,
     });

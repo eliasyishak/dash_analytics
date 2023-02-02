@@ -4,15 +4,13 @@
 
 import 'package:dash_analytics/dash_analytics.dart';
 
-final String tool = 'flutter-tools';
-
 final String measurementId = 'G-N1NXG28J5B';
 final String apiSecret = '4yT8__oER3Cd84dtx6r-_A';
 
 // Globally instantiate the analytics class at the entry
 // point of the tool
 final Analytics analytics = Analytics(
-  tool: tool,
+  tool: DashTool.flutterTools,
   measurementId: measurementId,
   apiSecret: apiSecret,
   branch: 'ey-test-branch',
@@ -26,7 +24,7 @@ void main() {
 
   print(analytics.telemetryEnabled);
   analytics.sendEvent(
-    eventName: DashEvents.hotReloadTime,
+    eventName: DashEvent.hotReloadTime,
     eventData: <String, int>{'time_ns': 345},
   );
   analytics.close();

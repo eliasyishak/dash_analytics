@@ -28,7 +28,7 @@ class Session {
         p.join(homeDirectory.path, kDartToolDirectoryName, kSessionFileName));
 
     final String sessionFileContents = sessionFile.readAsStringSync();
-    final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+    final Map<String, Object?> sessionObj = jsonDecode(sessionFileContents);
     final int sessionId = sessionObj['session_id'] as int;
     final int lastPing = sessionObj['last_ping'] as int;
 
@@ -101,7 +101,7 @@ class Session {
   /// making updates to the session file
   void _refreshSessionData() {
     final String sessionFileContents = _sessionFile.readAsStringSync();
-    final Map<String, dynamic> sessionObj = jsonDecode(sessionFileContents);
+    final Map<String, Object?> sessionObj = jsonDecode(sessionFileContents);
     _sessionId = sessionObj['session_id'] as int;
     _lastPing = sessionObj['last_ping'] as int;
   }
