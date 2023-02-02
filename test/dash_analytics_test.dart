@@ -745,4 +745,48 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(query!.toolCount, 2,
         reason: 'There should have been two tools in the persisted logs');
   });
+
+  test('Check that log data missing some keys results in null for stats', () {
+    // The following string represents a log item that is malformed (missing the `tool` key)
+    const String malformedLog =
+        '{"client_id":"d40133a0-7ea6-4347-b668-ffae94bb8774",'
+        '"events":[{"name":"hot_reload_time","params":{"time_ns":345}}],'
+        '"user_properties":{'
+        '"session_id":{"value":1675193534342},'
+        '"branch":{"value":"ey-test-branch"},'
+        '"host":{"value":"macOS"},'
+        '"flutter_version":{"value":"Flutter 3.6.0-7.0.pre.47"},'
+        '"dart_version":{"value":"Dart 2.19.0"},'
+        // '"tool":{"value":"flutter-tools"},'  NEEDS REMAIN REMOVED
+        '"local_time":{"value":"2023-01-31 14:32:14.592898"}}}';
+
+    logFile.writeAsStringSync(malformedLog);
+    final LogFileStats? query = analytics.logFileStats();
+
+    expect(query, isNull,
+        reason:
+            'The query should be null because `tool` is missing under `user_properties`');
+  });
+
+  test('Malformed local_time string should result in null for stats', () {
+    // The following string represents a log item that is malformed (missing the `tool` key)
+    const String malformedLog =
+        '{"client_id":"d40133a0-7ea6-4347-b668-ffae94bb8774",'
+        '"events":[{"name":"hot_reload_time","params":{"time_ns":345}}],'
+        '"user_properties":{'
+        '"session_id":{"value":1675193534342},'
+        '"branch":{"value":"ey-test-branch"},'
+        '"host":{"value":"macOS"},'
+        '"flutter_version":{"value":"Flutter 3.6.0-7.0.pre.47"},'
+        '"dart_version":{"value":"Dart 2.19.0"},'
+        '"tool":{"value":"flutter-tools"},'
+        '"local_time":{"value":"2023-xx-31 14:32:14.592898"}}}'; // PURPOSEFULLY MALFORMED
+
+    logFile.writeAsStringSync(malformedLog);
+    final LogFileStats? query = analytics.logFileStats();
+
+    expect(query, isNull,
+        reason:
+            'The query should be null because the `local_time` value is malformed');
+  });
 }

@@ -243,7 +243,9 @@ class LogItem {
         tool: tool!,
         localTime: localTime,
       );
-    } on Exception {
+    } on TypeError {
+      return null;
+    } on FormatException {
       return null;
     }
   }
