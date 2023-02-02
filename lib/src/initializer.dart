@@ -67,6 +67,12 @@ $tool=$dateStamp,$toolsMessageVersion
 ''');
   }
 
+  /// Creates that log file that will store the record formatted
+  /// events locally on the user's machine
+  void createLogFile({required File logFile}) {
+    logFile.createSync(recursive: true);
+  }
+
   /// Creates the session json file which will contain
   /// the current session id along with the timestamp for
   /// the last ping which will be used to increment the session
@@ -116,6 +122,13 @@ $tool=$dateStamp,$toolsMessageVersion
         p.join(homeDirectory.path, kDartToolDirectoryName, kSessionFileName));
     if (!sessionFile.existsSync()) {
       createSessionFile(sessionFile: sessionFile);
+    }
+
+    // Begin initialization checks for the log file to persist events locally
+    final File logFile = fs
+        .file(p.join(homeDirectory.path, kDartToolDirectoryName, kLogFileName));
+    if (!logFile.existsSync()) {
+      createLogFile(logFile: logFile);
     }
   }
 }

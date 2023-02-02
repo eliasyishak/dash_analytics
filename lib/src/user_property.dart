@@ -35,10 +35,10 @@ class UserProperty {
   /// update the session file and get a new session id if necessary
   ///
   /// https://developers.google.com/analytics/devguides/collection/protocol/ga4/user-properties?client_type=gtag
-  Map<String, Map<String, dynamic>> preparePayload() {
-    return <String, Map<String, dynamic>>{
-      for (MapEntry<String, dynamic> entry in _toMap().entries)
-        entry.key: <String, dynamic>{'value': entry.value}
+  Map<String, Map<String, Object?>> preparePayload() {
+    return <String, Map<String, Object?>>{
+      for (MapEntry<String, Object?> entry in _toMap().entries)
+        entry.key: <String, Object?>{'value': entry.value}
     };
   }
 
@@ -49,7 +49,7 @@ class UserProperty {
 
   /// Convert the data stored in this class into a map while also
   /// getting the latest session id using the [Session] class
-  Map<String, dynamic> _toMap() => <String, dynamic>{
+  Map<String, Object?> _toMap() => <String, Object?>{
         'session_id': session.getSessionId(),
         'branch': branch,
         'host': host,

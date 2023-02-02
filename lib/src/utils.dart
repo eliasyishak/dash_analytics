@@ -31,16 +31,16 @@ import 'user_property.dart';
 /// }
 /// ```
 /// https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag
-Map<String, dynamic> generateRequestBody({
+Map<String, Object?> generateRequestBody({
   required String clientId,
-  required DashEvents eventName,
-  required Map<String, dynamic> eventData,
+  required DashEvent eventName,
+  required Map<String, Object?> eventData,
   required UserProperty userProperty,
 }) =>
-    <String, dynamic>{
+    <String, Object?>{
       'client_id': clientId,
-      'events': <Map<String, dynamic>>[
-        <String, dynamic>{
+      'events': <Map<String, Object?>>[
+        <String, Object?>{
           'name': eventName.label,
           'params': eventData,
         }

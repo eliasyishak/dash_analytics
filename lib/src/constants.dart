@@ -55,6 +55,12 @@ reporting=1
 /// for this package will be located
 const String kDartToolDirectoryName = '.dart';
 
+/// How many data records to store in the log file
+const int kLogFileLength = 2500;
+
+/// Filename for the log file to persist sent events on user's machine
+const String kLogFileName = 'dash-analytics.log';
+
 /// The minimum length for a session
 const int kSessionDurationMinutes = 30;
 
