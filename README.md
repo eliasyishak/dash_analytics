@@ -44,6 +44,17 @@ void main() {
     // Calculate the metric to send
     final int runTime = DateTime.now().difference(start).inMilliseconds;
 
-    // FINISH THIS PART WHEN WE HAVE DECIDED ON HOW TO SEND EVENTS
+    // Generate the body for the event data
+    final Map<String, int> body = {
+      'time_ns': runTime,
+    };
+
+    // Choose one of the enum values for [DashEvent] which should
+    // have all possible events; if not there, open an issue for the
+    // team to add
+    final DashEvent eventName = DashEvent.hotReloadTime;
+
+    // Make a call to the [Analytics] api to send the data
+    analytics.sendEvent(...);
 }
 ```
