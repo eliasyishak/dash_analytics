@@ -7,6 +7,14 @@
 /// The [label] for each enum value is what will be logged, the [description]
 /// is here for documentation purposes
 enum DashEvent {
+  /// Hot reload duration
+  ///
+  /// **Recommended data to send**
+  /// ```
+  /// {
+  ///   'time_ms': 500,  // time to complete in milliseconds
+  /// }
+  /// ```
   hotReloadTime(
     label: 'hot_reload_time',
     description: 'Hot reload duration',
