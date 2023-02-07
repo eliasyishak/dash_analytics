@@ -18,4 +18,4 @@ jobs:
         run: dart pub get
       
       - name: Run test suite
-        run: dart 
+        run: dart test
