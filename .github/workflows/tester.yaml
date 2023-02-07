@@ -1,0 +1,21 @@
+name: Test package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Install package dependencies
+        run: dart pub get
+      
+      - name: Run test suite
+        run: dart 
