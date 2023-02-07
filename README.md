@@ -65,6 +65,25 @@ void main() {
 }
 ```
 
+## Opting In and Out of Analytics Collection
+
+It will be important for each Dash tool to expose a trivial method to
+disabling or enabling analytics collection. Based on how the user interacts
+with the tool, this can be done through the CLI, IDE, etc. The Dash tool will
+then pass a boolean to an API exposed by the package as shown below
+
+```dart
+// Begin by initializing the class
+final Analytics analytics = Analytics(...);
+
+// The boolean below simulates the user deciding to opt-out
+// of Analytics collection
+final bool status = false;
+
+// Call the method to pass the boolean
+analytics.setTelemetry(status);
+```
+
 ## Informing Users About Analytics Opt-In Status
 
 When a user first uses any Dash tool with this package enabled, they
