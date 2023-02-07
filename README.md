@@ -1,39 +1,121 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+This package is intended to be used on Dash (Flutter and Dart) related tooling.
+It provides APIs to send events to Google Analytics using the Measurement Protocol.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+To get started using this package, import at the entrypoint dart file and
+initialize with the required parameters
 
 ```dart
-const like = 'sample';
+import 'dash_analytics';
+
+// Constants that should be resolved by the client using package
+final DashTool tool = DashTool.flutterTools; // Restricted to enum provided by package
+final String measurementId = 'xxxxxxxxxxxx'; // To be provided to client
+final String apiSecret = 'xxxxxxxxxxxx'; // To be provided to client
+
+// Values that need to be provided by the client that may
+// need to be calculated
+final String branch = ...;
+final String flutterVersion = ...;
+final String dartVersion = ...;
+
+// Initialize the [Analytics] class with the required parameters;
+// preferably outside of the [main] method
+final Analytics analytics = Analytics(
+  tool: tool,
+  measurementId: measurementId,
+  apiSecret: apiSecret,
+  branch: branch,
+  flutterVersion: flutterVersion,
+  dartVersion: dartVersion,
+);
+
+// Timing a process and sending the event
+void main() {
+    DateTime start = DateTime.now();
+    int count = 0;
+
+    // Example of long running process
+    for (int i = 0; i < 2000; i++) {
+        count += i;
+    }
+    
+    // Calculate the metric to send
+    final int runTime = DateTime.now().difference(start).inMilliseconds;
+
+    // Generate the body for the event data
+    final Map<String, int> eventData = {
+      'time_ns': runTime,
+    };
+
+    // Choose one of the enum values for [DashEvent] which should
+    // have all possible events; if not there, open an issue for the
+    // team to add
+    final DashEvent eventName = ...; // Select appropriate DashEvent enum value
+
+    // Make a call to the [Analytics] api to send the data
+    analytics.sendEvent(
+      eventName: eventName,
+      eventData: eventData,
+    );
+
+    // Close the client connection on exit
+    analytics.close();
+}
 ```
 
-## Additional information
+## Opting In and Out of Analytics Collection
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+It will be important for each Dash tool to expose a trivial method to
+disabling or enabling analytics collection. Based on how the user interacts
+with the tool, this can be done through the CLI, IDE, etc. The Dash tool will
+then pass a boolean to an API exposed by the package as shown below
+
+```dart
+// Begin by initializing the class
+final Analytics analytics = Analytics(...);
+
+// The boolean below simulates the user deciding to opt-out
+// of Analytics collection
+final bool status = false;
+
+// Call the method to pass the boolean
+analytics.setTelemetry(status);
+```
+
+## Informing Users About Analytics Opt-In Status
+
+When a user first uses any Dash tool with this package enabled, they
+will be enrolled into Analytics collection. It will be the responsiblity
+of the Dash tool using this package to display the proper Analytics messaging
+and inform them on how to Opt-Out of Analytics collection if they wish. The
+package will expose APIs that will make it easy to configure Opt-In status.
+
+```dart
+// Begin by initializing the class
+final Analytics analytics = Analytics(...);
+
+// This should be performed every time the Dash tool starts up
+if (analytics.shouldShowMessage) {
+
+  // How each Dash tool displays the message will be unique,
+  // print statement used for trivial usage example
+  print(analytics.toolsMessage);
+}
+```
+
+## Checking User Opt-In Status
+
+Some Dash tools may need to know if the user has opted in for Analytics
+collection in order to enable additional functionality. The example below
+shows how to check the status
+
+```dart
+// Begin by initializing the class
+final Analytics analytics = Analytics(...);
+
+// This getter will return a boolean showing the status;
+// print statement used for trivial usage example
+print('This user's status: ${analytics.telemetryEnabled}');  // true if opted-in
+```
