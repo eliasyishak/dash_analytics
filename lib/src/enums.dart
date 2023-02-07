@@ -9,7 +9,7 @@
 enum DashEvent {
   /// Hot reload duration
   ///
-  /// **Recommended data to send**
+  /// **Required data to send with event**
   /// ```
   /// {
   ///   'time_ms': 500,  // time to complete in milliseconds
@@ -19,16 +19,21 @@ enum DashEvent {
     label: 'hot_reload_time',
     description: 'Hot reload duration',
     toolOwner: DashTool.flutterTools,
+    requiredKeys: <String>{
+      'time_ms',
+    },
   ),
   ;
 
   final String label;
   final String description;
   final DashTool toolOwner;
+  final Set<String> requiredKeys;
   const DashEvent({
     required this.label,
     required this.description,
     required this.toolOwner,
+    required this.requiredKeys,
   });
 }
 

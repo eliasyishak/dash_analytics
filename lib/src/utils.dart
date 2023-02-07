@@ -66,6 +66,21 @@ Directory getHomeDirectory(FileSystem fs) {
   return fs.directory(home!);
 }
 
+/// Method to validate that the `Map` for the [eventData] contains all
+/// of the necessary data for a given [DashEvent] as indicated by the
+/// Set found in [DashEvent.requiredKeys] for each event
+bool validateEventData({
+  required DashEvent eventName,
+  required Map<String, Object?> eventData,
+}) {
+  // Iterate through each of the [DashEvent.requiredKeys] and return
+  // false if the key is not detected in the [eventData] map
+  for (String key in eventName.requiredKeys) {
+    if (!eventData.containsKey(key)) return false;
+  }
+  return true;
+}
+
 /// A UUID generator.
 ///
 /// This will generate unique IDs in the format:

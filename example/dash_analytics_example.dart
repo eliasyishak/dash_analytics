@@ -25,7 +25,7 @@ void main() {
   print(analytics.telemetryEnabled);
   analytics.sendEvent(
     eventName: DashEvent.hotReloadTime,
-    eventData: <String, int>{'time_ns': 345},
+    eventData: <String, int>{'time_ms': 123},
   );
   analytics.close();
 

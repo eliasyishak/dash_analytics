@@ -246,6 +246,14 @@ class AnalyticsImpl implements Analytics {
     required Map<String, Object?> eventData,
   }) {
     if (!telemetryEnabled) return null;
+    if (!validateEventData(
+      eventName: eventName,
+      eventData: eventData,
+    )) {
+      throw Exception(
+          'The event: $eventName is missing one of the following keys:\n'
+          '${eventName.requiredKeys.join(", ")}');
+    }
 
     // Construct the body of the request
     final Map<String, Object?> body = generateRequestBody(
@@ -293,6 +301,14 @@ class TestAnalytics extends AnalyticsImpl {
     required Map<String, Object?> eventData,
   }) {
     if (!telemetryEnabled) return null;
+    if (!validateEventData(
+      eventName: eventName,
+      eventData: eventData,
+    )) {
+      throw Exception(
+          'The event: $eventName is missing one of the following keys:\n'
+          '${eventName.requiredKeys.join(", ")}');
+    }
 
     // Calling the [generateRequestBody] method will ensure that the
     // session file is getting updated without actually making any
