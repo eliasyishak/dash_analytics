@@ -10,6 +10,7 @@ import 'package:clock/clock.dart';
 import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
+import 'package:yaml/yaml.dart';
 
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
@@ -423,6 +424,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       'host',
       'flutter_version',
       'dart_version',
+      'dash_analytics_version',
       'tool',
       'local_time',
     ];
@@ -789,5 +791,20 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(query, isNull,
         reason:
             'The query should be null because the `local_time` value is malformed');
+  });
+
+  test('Check that the constant kPackageVersion matches pubspec version', () {
+    // Parse the contents of the pubspec.yaml
+    final String pubspecYamlString = io.File('pubspec.yaml').readAsStringSync();
+
+    // Parse into a yaml document to extract the version number
+    final YamlMap doc = loadYaml(pubspecYamlString);
+    final String version = doc['version'];
+
+    expect(version, kPackageVersion,
+        reason: 'The package version in the pubspec and '
+            'constants.dart need to match\n'
+            'Pubspec: $version && constants.dart: $kPackageVersion\n\n'
+            'Make sure both are the same');
   });
 }

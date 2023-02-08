@@ -6,6 +6,7 @@ import 'dart:convert';
 
 import 'package:clock/clock.dart';
 
+import 'constants.dart';
 import 'session.dart';
 
 class UserProperty {
@@ -55,6 +56,7 @@ class UserProperty {
         'host': host,
         'flutter_version': flutterVersion,
         'dart_version': dartVersion,
+        'dash_analytics_version': kPackageVersion,
         'tool': tool,
         'local_time': '${clock.now()}',
       };
