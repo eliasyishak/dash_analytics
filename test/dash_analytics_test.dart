@@ -10,6 +10,7 @@ import 'package:clock/clock.dart';
 import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:test/test.dart';
+import 'package:yaml/yaml.dart';
 
 import 'package:dash_analytics/dash_analytics.dart';
 import 'package:dash_analytics/src/config_handler.dart';
@@ -417,20 +418,22 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
   });
 
   test('Check that UserProperty class has all the necessary keys', () {
-    expect(analytics.userPropertyMap.keys.contains('session_id'), true,
-        reason: 'The session_id variable is required');
-    expect(analytics.userPropertyMap.keys.contains('branch'), true,
-        reason: 'The branch variable is required');
-    expect(analytics.userPropertyMap.keys.contains('host'), true,
-        reason: 'The host variable is required');
-    expect(analytics.userPropertyMap.keys.contains('flutter_version'), true,
-        reason: 'The flutter_version variable is required');
-    expect(analytics.userPropertyMap.keys.contains('dart_version'), true,
-        reason: 'The dart_version variable is required');
-    expect(analytics.userPropertyMap.keys.contains('tool'), true,
-        reason: 'The tool variable is required');
-    expect(analytics.userPropertyMap.keys.contains('local_time'), true,
-        reason: 'The local_time variable is required');
+    const List<String> userPropertyKeys = <String>[
+      'session_id',
+      'branch',
+      'host',
+      'flutter_version',
+      'dart_version',
+      'dash_analytics_version',
+      'tool',
+      'local_time',
+    ];
+    expect(analytics.userPropertyMap.keys.length, userPropertyKeys.length,
+        reason: 'There should only be ${userPropertyKeys.length} keys');
+    for (String key in userPropertyKeys) {
+      expect(analytics.userPropertyMap.keys.contains(key), true,
+          reason: 'The $key variable is required');
+    }
   });
 
   test('The minimum session duration should be at least 30 minutes', () {
@@ -788,5 +791,20 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(query, isNull,
         reason:
             'The query should be null because the `local_time` value is malformed');
+  });
+
+  test('Check that the constant kPackageVersion matches pubspec version', () {
+    // Parse the contents of the pubspec.yaml
+    final String pubspecYamlString = io.File('pubspec.yaml').readAsStringSync();
+
+    // Parse into a yaml document to extract the version number
+    final YamlMap doc = loadYaml(pubspecYamlString);
+    final String version = doc['version'];
+
+    expect(version, kPackageVersion,
+        reason: 'The package version in the pubspec and '
+            'constants.dart need to match\n'
+            'Pubspec: $version && constants.dart: $kPackageVersion\n\n'
+            'Make sure both are the same');
   });
 }
