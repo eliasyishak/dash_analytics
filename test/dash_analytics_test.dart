@@ -37,7 +37,7 @@ void main() {
   const String apiSecret = 'apiSecret';
   const int toolsMessageVersion = 1;
   const String toolsMessage = 'toolsMessage';
-  const String branch = 'branch';
+  const String flutterChannel = 'flutterChannel';
   const String flutterVersion = 'flutterVersion';
   const String dartVersion = 'dartVersion';
   const DevicePlatform platform = DevicePlatform.macos;
@@ -57,7 +57,7 @@ void main() {
       homeDirectory: home,
       measurementId: measurementId,
       apiSecret: apiSecret,
-      branch: branch,
+      flutterChannel: flutterChannel,
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
       flutterVersion: flutterVersion,
@@ -81,7 +81,7 @@ void main() {
     // created within analytics for testing
     userProperty = UserProperty(
       session: Session(homeDirectory: home, fs: fs),
-      branch: branch,
+      flutterChannel: flutterChannel,
       host: platform.label,
       flutterVersion: flutterVersion,
       dartVersion: dartVersion,
@@ -114,7 +114,7 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      branch: 'ey-test-branch',
+      flutterChannel: 'ey-test-channel',
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -168,7 +168,7 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      branch: 'ey-test-branch',
+      flutterChannel: 'ey-test-channel',
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -191,7 +191,7 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      branch: 'ey-test-branch',
+      flutterChannel: 'ey-test-channel',
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -244,7 +244,7 @@ void main() {
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      branch: 'ey-test-branch',
+      flutterChannel: 'ey-test-channel',
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -273,7 +273,7 @@ void main() {
       homeDirectory: home,
       measurementId: measurementId,
       apiSecret: apiSecret,
-      branch: branch,
+      flutterChannel: flutterChannel,
       toolsMessageVersion: toolsMessageVersion + 1,
       toolsMessage: toolsMessage,
       flutterVersion: flutterVersion,
@@ -394,7 +394,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       homeDirectory: home,
       measurementId: measurementId,
       apiSecret: apiSecret,
-      branch: branch,
+      flutterChannel: flutterChannel,
       toolsMessageVersion: toolsMessageVersion + 1,
       toolsMessage: toolsMessage,
       flutterVersion: flutterVersion,
@@ -420,7 +420,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
   test('Check that UserProperty class has all the necessary keys', () {
     const List<String> userPropertyKeys = <String>[
       'session_id',
-      'branch',
+      'flutter_channel',
       'host',
       'flutter_version',
       'dart_version',
@@ -462,7 +462,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         homeDirectory: home,
         measurementId: 'measurementId',
         apiSecret: 'apiSecret',
-        branch: 'ey-test-branch',
+        flutterChannel: flutterChannel,
         toolsMessageVersion: toolsMessageVersion,
         toolsMessage: toolsMessage,
         flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -494,7 +494,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         homeDirectory: home,
         measurementId: 'measurementId',
         apiSecret: 'apiSecret',
-        branch: 'ey-test-branch',
+        flutterChannel: flutterChannel,
         toolsMessageVersion: toolsMessageVersion,
         toolsMessage: toolsMessage,
         flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -541,7 +541,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         homeDirectory: home,
         measurementId: 'measurementId',
         apiSecret: 'apiSecret',
-        branch: 'ey-test-branch',
+        flutterChannel: flutterChannel,
         toolsMessageVersion: toolsMessageVersion,
         toolsMessage: toolsMessage,
         flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -576,7 +576,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         homeDirectory: home,
         measurementId: 'measurementId',
         apiSecret: 'apiSecret',
-        branch: 'ey-test-branch',
+        flutterChannel: flutterChannel,
         toolsMessageVersion: toolsMessageVersion,
         toolsMessage: toolsMessage,
         flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -701,8 +701,8 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     expect(firstQuery.sessionCount, 1,
         reason:
             'There should only be one session after the initial send event');
-    expect(firstQuery.branchCount, 1,
-        reason: 'There should only be one branch logged');
+    expect(firstQuery.flutterChannelCount, 1,
+        reason: 'There should only be one flutter channel logged');
     expect(firstQuery.toolCount, 1,
         reason: 'There should only be one tool logged');
 
@@ -727,7 +727,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
       homeDirectory: home,
       measurementId: 'measurementId',
       apiSecret: 'apiSecret',
-      branch: 'ey-test-branch',
+      flutterChannel: flutterChannel,
       toolsMessageVersion: toolsMessageVersion,
       toolsMessage: toolsMessage,
       flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
@@ -756,7 +756,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         '"events":[{"name":"hot_reload_time","params":{"time_ns":345}}],'
         '"user_properties":{'
         '"session_id":{"value":1675193534342},'
-        '"branch":{"value":"ey-test-branch"},'
+        '"flutter_channel":{"value":"ey-test-channel"},'
         '"host":{"value":"macOS"},'
         '"flutter_version":{"value":"Flutter 3.6.0-7.0.pre.47"},'
         '"dart_version":{"value":"Dart 2.19.0"},'
@@ -778,7 +778,7 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         '"events":[{"name":"hot_reload_time","params":{"time_ns":345}}],'
         '"user_properties":{'
         '"session_id":{"value":1675193534342},'
-        '"branch":{"value":"ey-test-branch"},'
+        '"flutter_channel":{"value":"ey-test-channel"},'
         '"host":{"value":"macOS"},'
         '"flutter_version":{"value":"Flutter 3.6.0-7.0.pre.47"},'
         '"dart_version":{"value":"Dart 2.19.0"},'
