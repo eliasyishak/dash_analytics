@@ -417,20 +417,21 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
   });
 
   test('Check that UserProperty class has all the necessary keys', () {
-    expect(analytics.userPropertyMap.keys.contains('session_id'), true,
-        reason: 'The session_id variable is required');
-    expect(analytics.userPropertyMap.keys.contains('branch'), true,
-        reason: 'The branch variable is required');
-    expect(analytics.userPropertyMap.keys.contains('host'), true,
-        reason: 'The host variable is required');
-    expect(analytics.userPropertyMap.keys.contains('flutter_version'), true,
-        reason: 'The flutter_version variable is required');
-    expect(analytics.userPropertyMap.keys.contains('dart_version'), true,
-        reason: 'The dart_version variable is required');
-    expect(analytics.userPropertyMap.keys.contains('tool'), true,
-        reason: 'The tool variable is required');
-    expect(analytics.userPropertyMap.keys.contains('local_time'), true,
-        reason: 'The local_time variable is required');
+    const List<String> userPropertyKeys = <String>[
+      'session_id',
+      'branch',
+      'host',
+      'flutter_version',
+      'dart_version',
+      'tool',
+      'local_time',
+    ];
+    expect(analytics.userPropertyMap.keys.length, userPropertyKeys.length,
+        reason: 'There should only be ${userPropertyKeys.length} keys');
+    for (String key in userPropertyKeys) {
+      expect(analytics.userPropertyMap.keys.contains(key), true,
+          reason: 'The $key variable is required');
+    }
   });
 
   test('The minimum session duration should be at least 30 minutes', () {
