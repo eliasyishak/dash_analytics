@@ -16,7 +16,6 @@ final String apiSecret = 'xxxxxxxxxxxx'; // To be provided to client
 
 // Values that need to be provided by the client that may
 // need to be calculated
-final String branch = ...;
 final String flutterVersion = ...;
 final String dartVersion = ...;
 
@@ -26,7 +25,6 @@ final Analytics analytics = Analytics(
   tool: tool,
   measurementId: measurementId,
   apiSecret: apiSecret,
-  branch: branch,
   flutterVersion: flutterVersion,
   dartVersion: dartVersion,
 );

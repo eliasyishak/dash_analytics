@@ -13,7 +13,6 @@ final Analytics analytics = Analytics(
   tool: DashTool.flutterTools,
   measurementId: measurementId,
   apiSecret: apiSecret,
-  branch: 'ey-test-branch',
   flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
   dartVersion: 'Dart 2.19.0',
 );
