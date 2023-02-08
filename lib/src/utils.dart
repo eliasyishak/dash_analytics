@@ -21,7 +21,7 @@ import 'user_property.dart';
 ///   "events": [{ "name": "testing_from_dash", "params": { "time_ns": 345 } }],
 ///   "user_properties": {
 ///     "session_id": { "value": 1673466750423 },
-///     "branch": { "value": "ey-test-branch" },
+///     "flutter_channel": { "value": "ey-test-channel" },
 ///     "host": { "value": "macos" },
 ///     "flutter_version": { "value": "Flutter 3.6.0-7.0.pre.47" },
 ///     "dart_version": { "value": "Dart 2.19.0" },

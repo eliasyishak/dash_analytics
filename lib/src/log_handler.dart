@@ -18,8 +18,8 @@ class LogFileStats {
   /// The number of unique session ids found in the log file
   final int sessionCount;
 
-  /// The number of unique branches found in the log file
-  final int branchCount;
+  /// The number of unique flutter channels found in the log file
+  final int flutterChannelCount;
 
   /// The number of unique tools found in the log file
   final int toolCount;
@@ -29,7 +29,7 @@ class LogFileStats {
     required this.startDateTime,
     required this.endDateTime,
     required this.sessionCount,
-    required this.branchCount,
+    required this.flutterChannelCount,
     required this.toolCount,
   });
 
@@ -38,7 +38,7 @@ class LogFileStats {
         'startDateTime': startDateTime.toString(),
         'endDateTime': endDateTime.toString(),
         'sessionCount': sessionCount,
-        'branchCount': branchCount,
+        'flutterChannelCount': flutterChannelCount,
         'toolCount': toolCount,
       });
 }
@@ -84,12 +84,12 @@ class LogHandler {
     // Collection of unique sessions
     final Map<String, Set<Object>> counter = <String, Set<Object>>{
       'sessions': <int>{},
-      'branch': <String>{},
+      'flutter_channel': <String>{},
       'tool': <String>{},
     };
     for (LogItem record in records) {
       counter['sessions']!.add(record.sessionId);
-      counter['branch']!.add(record.branch);
+      counter['flutter_channel']!.add(record.flutterChannel);
       counter['tool']!.add(record.tool);
     }
 
@@ -97,7 +97,7 @@ class LogHandler {
       startDateTime: startDateTime,
       endDateTime: endDateTime,
       sessionCount: counter['sessions']!.length,
-      branchCount: counter['branch']!.length,
+      flutterChannelCount: counter['flutter_channel']!.length,
       toolCount: counter['tool']!.length,
     );
   }
@@ -126,7 +126,7 @@ class LogHandler {
 /// Data class for each record persisted on the client's machine
 class LogItem {
   final int sessionId;
-  final String branch;
+  final String flutterChannel;
   final String host;
   final String flutterVersion;
   final String dartVersion;
@@ -135,7 +135,7 @@ class LogItem {
 
   LogItem({
     required this.sessionId,
-    required this.branch,
+    required this.flutterChannel,
     required this.host,
     required this.flutterVersion,
     required this.dartVersion,
@@ -168,8 +168,8 @@ class LogItem {
   ///         "session_id": {
   ///             "value": 1675193534342
   ///         },
-  ///         "branch": {
-  ///             "value": "ey-test-branch"
+  ///         "flutter_channel": {
+  ///             "value": "ey-test-channel"
   ///         },
   ///         "host": {
   ///             "value": "macOS"
@@ -203,8 +203,8 @@ class LogItem {
       // Parse out the values from the top level key = 'user_properties`
       final int? sessionId =
           (userProps['session_id']! as Map<String, Object?>)['value'] as int?;
-      final String? branch =
-          (userProps['branch']! as Map<String, Object?>)['value'] as String?;
+      final String? flutterChannel = (userProps['flutter_channel']!
+          as Map<String, Object?>)['value'] as String?;
       final String? host =
           (userProps['host']! as Map<String, Object?>)['value'] as String?;
       final String? flutterVersion = (userProps['flutter_version']!
@@ -220,7 +220,7 @@ class LogItem {
       // indicates the record is malformed
       final List<Object?> values = <Object?>[
         sessionId,
-        branch,
+        flutterChannel,
         host,
         flutterVersion,
         dartVersion,
@@ -236,7 +236,7 @@ class LogItem {
 
       return LogItem(
         sessionId: sessionId!,
-        branch: branch!,
+        flutterChannel: flutterChannel!,
         host: host!,
         flutterVersion: flutterVersion!,
         dartVersion: dartVersion!,
