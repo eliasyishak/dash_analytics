@@ -11,6 +11,7 @@ import 'session.dart';
 
 class UserProperty {
   final Session session;
+  final String branch;
   final String host;
   final String flutterVersion;
   final String dartVersion;
@@ -21,6 +22,7 @@ class UserProperty {
   /// session data to send in the json payload to Google Analytics
   UserProperty({
     required this.session,
+    required this.branch,
     required this.host,
     required this.flutterVersion,
     required this.dartVersion,
@@ -50,6 +52,7 @@ class UserProperty {
   /// getting the latest session id using the [Session] class
   Map<String, Object?> _toMap() => <String, Object?>{
         'session_id': session.getSessionId(),
+        'branch': branch,
         'host': host,
         'flutter_version': flutterVersion,
         'dart_version': dartVersion,

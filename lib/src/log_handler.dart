@@ -18,8 +18,8 @@ class LogFileStats {
   /// The number of unique session ids found in the log file
   final int sessionCount;
 
-  /// The number of unique flutter versions found in the log file
-  final int flutterVersionCount;
+  /// The number of unique branches found in the log file
+  final int branchCount;
 
   /// The number of unique tools found in the log file
   final int toolCount;
@@ -29,7 +29,7 @@ class LogFileStats {
     required this.startDateTime,
     required this.endDateTime,
     required this.sessionCount,
-    required this.flutterVersionCount,
+    required this.branchCount,
     required this.toolCount,
   });
 
@@ -38,7 +38,7 @@ class LogFileStats {
         'startDateTime': startDateTime.toString(),
         'endDateTime': endDateTime.toString(),
         'sessionCount': sessionCount,
-        'flutterVersionCount': flutterVersionCount,
+        'branchCount': branchCount,
         'toolCount': toolCount,
       });
 }
@@ -84,12 +84,12 @@ class LogHandler {
     // Collection of unique sessions
     final Map<String, Set<Object>> counter = <String, Set<Object>>{
       'sessions': <int>{},
-      'flutter_version': <String>{},
+      'branch': <String>{},
       'tool': <String>{},
     };
     for (LogItem record in records) {
       counter['sessions']!.add(record.sessionId);
-      counter['flutter_version']!.add(record.flutterVersion);
+      counter['branch']!.add(record.branch);
       counter['tool']!.add(record.tool);
     }
 
@@ -97,7 +97,7 @@ class LogHandler {
       startDateTime: startDateTime,
       endDateTime: endDateTime,
       sessionCount: counter['sessions']!.length,
-      flutterVersionCount: counter['flutter_version']!.length,
+      branchCount: counter['branch']!.length,
       toolCount: counter['tool']!.length,
     );
   }
@@ -126,19 +126,19 @@ class LogHandler {
 /// Data class for each record persisted on the client's machine
 class LogItem {
   final int sessionId;
+  final String branch;
   final String host;
   final String flutterVersion;
   final String dartVersion;
-  final String dashAnalyticsVersion;
   final String tool;
   final DateTime localTime;
 
   LogItem({
     required this.sessionId,
+    required this.branch,
     required this.host,
     required this.flutterVersion,
     required this.dartVersion,
-    required this.dashAnalyticsVersion,
     required this.tool,
     required this.localTime,
   });
@@ -168,6 +168,9 @@ class LogItem {
   ///         "session_id": {
   ///             "value": 1675193534342
   ///         },
+  ///         "branch": {
+  ///             "value": "ey-test-branch"
+  ///         },
   ///         "host": {
   ///             "value": "macOS"
   ///         },
@@ -176,9 +179,6 @@ class LogItem {
   ///         },
   ///         "dart_version": {
   ///             "value": "Dart 2.19.0"
-  ///         },
-  ///         "dash_analytics_version": {
-  ///             "value": "0.0.1"
   ///         },
   ///         "tool": {
   ///             "value": "flutter-tools"
@@ -203,13 +203,13 @@ class LogItem {
       // Parse out the values from the top level key = 'user_properties`
       final int? sessionId =
           (userProps['session_id']! as Map<String, Object?>)['value'] as int?;
+      final String? branch =
+          (userProps['branch']! as Map<String, Object?>)['value'] as String?;
       final String? host =
           (userProps['host']! as Map<String, Object?>)['value'] as String?;
       final String? flutterVersion = (userProps['flutter_version']!
           as Map<String, Object?>)['value'] as String?;
       final String? dartVersion = (userProps['dart_version']!
-          as Map<String, Object?>)['value'] as String?;
-      final String? dashAnalyticsVersion = (userProps['dash_analytics_version']!
           as Map<String, Object?>)['value'] as String?;
       final String? tool =
           (userProps['tool']! as Map<String, Object?>)['value'] as String?;
@@ -220,10 +220,10 @@ class LogItem {
       // indicates the record is malformed
       final List<Object?> values = <Object?>[
         sessionId,
+        branch,
         host,
         flutterVersion,
         dartVersion,
-        dashAnalyticsVersion,
         tool,
         localTimeString,
       ];
@@ -236,10 +236,10 @@ class LogItem {
 
       return LogItem(
         sessionId: sessionId!,
+        branch: branch!,
         host: host!,
         flutterVersion: flutterVersion!,
         dartVersion: dartVersion!,
-        dashAnalyticsVersion: dashAnalyticsVersion!,
         tool: tool!,
         localTime: localTime,
       );
