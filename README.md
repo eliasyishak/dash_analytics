@@ -1,4 +1,4 @@
-This package is intended to be used on Dash (Flutter and Dart) related tooling.
+This package is intended to be used on Dash (Flutter, Dart, etc.) related tooling only.
 It provides APIs to send events to Google Analytics using the Measurement Protocol.
 
 ## Usage
@@ -119,3 +119,42 @@ final Analytics analytics = Analytics(...);
 // print statement used for trivial usage example
 print('This user's status: ${analytics.telemetryEnabled}');  // true if opted-in
 ```
+
+## Advanced Usage: Querying Locally Persisted Logs
+
+This package enables dash tools to persist the events that have been
+sent to Google Analytics for logging by default. This can be very helpful if
+dash tools would like to understand the user's activity level across all
+dash related tooling. For example, if querying the locally persisted logs
+shows that the user has not been active for N number of days, a dash tool that
+works within an IDE can prompt the user with a survey to understand why their
+level of activity has dropped.
+
+The snippet below shows how to invoke the query and a sample response
+
+```dart
+// Begin by initializing the class
+final Analytics analytics = Analytics(...);
+
+// Printing the query results returns json formatted
+// string to view; data can also be accessed through
+// [LogFileStats] getters
+print(analytics.logFileStats());
+
+// Prints out the below
+// {
+//     "startDateTime": "2023-02-08 15:07:10.293728",
+//     "endDateTime": "2023-02-08 15:07:10.299678",
+//     "sessionCount": 1,
+//     "flutterChannelCount": 1,
+//     "toolCount": 1
+// }
+```
+
+Explanation of the each key above
+
+- startDateTime: the earliest event that was sent
+- endDateTime: the latest, most recent event that was sent
+- sessionCount: count of sessions; sessions have a minimum time of 30 minutes
+- flutterChannelCount: count of flutter channels (can be 0 if developer is a Dart dev only)
+- toolCount: count of the dash tools sending analytics
