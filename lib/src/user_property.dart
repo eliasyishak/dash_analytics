@@ -11,9 +11,9 @@ import 'session.dart';
 
 class UserProperty {
   final Session session;
-  final String flutterChannel;
+  final String? flutterChannel;
   final String host;
-  final String flutterVersion;
+  final String? flutterVersion;
   final String dartVersion;
   final String tool;
 
