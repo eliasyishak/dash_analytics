@@ -807,4 +807,48 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
             'Pubspec: $version && constants.dart: $kPackageVersion\n\n'
             'Make sure both are the same');
   });
+
+  test('Null values for flutter parameters is reflected properly in log file',
+      () {
+    final Analytics secondAnalytics = Analytics.test(
+      tool: secondTool,
+      homeDirectory: home,
+      measurementId: 'measurementId',
+      apiSecret: 'apiSecret',
+      // flutterChannel: flutterChannel,           THIS NEEDS TO REMAIN REMOVED
+      // toolsMessageVersion: toolsMessageVersion, THIS NEEDS TO REMAIN REMOVED
+      toolsMessage: toolsMessage,
+      flutterVersion: 'Flutter 3.6.0-7.0.pre.47',
+      dartVersion: 'Dart 2.19.0',
+      fs: fs,
+      platform: platform,
+    );
+
+    // Send an event and check that the query stats reflects what is expected
+    secondAnalytics.sendEvent(
+        eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
+
+    // Query the log file stats to verify that there are two tools
+    LogFileStats? query = analytics.logFileStats();
+
+    expect(query!.toolCount, 1,
+        reason: 'There should have only been on tool that sent events');
+    expect(query!.flutterChannelCount, 0,
+        reason:
+            'The instance does not have flutter information so it should be 0');
+
+    // Sending a query with the first analytics instance which has flutter information
+    // available should reflect in the query that there is 1 flutter channel present
+    analytics.sendEvent(
+        eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
+    LogFileStats? query2 = analytics.logFileStats();
+
+    expect(query2!.toolCount, 2,
+        reason: 'Two different analytics instances have '
+            'been initialized and sent events');
+    expect(query2!.sessionCount, query!.sessionCount,
+        reason: 'The session should have remained the same');
+    expect(query2!.flutterChannelCount, 1,
+        reason: 'The first instance has flutter information initialized');
+  });
 }

@@ -27,6 +27,7 @@ void main() {
     eventName: DashEvent.hotReloadTime,
     eventData: <String, int>{'time_ns': 345},
   );
+  print(analytics.logFileStats());
   analytics.close();
 
   DateTime end = DateTime.now();
