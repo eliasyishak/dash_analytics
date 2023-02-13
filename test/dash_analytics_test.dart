@@ -743,9 +743,9 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
 
     // Query the log file stats to verify that there are two tools
-    LogFileStats? query = analytics.logFileStats();
+    LogFileStats query = analytics.logFileStats()!;
 
-    expect(query!.toolCount, 2,
+    expect(query.toolCount, 2,
         reason: 'There should have been two tools in the persisted logs');
   });
 
@@ -829,11 +829,11 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
         eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
 
     // Query the log file stats to verify that there are two tools
-    LogFileStats? query = analytics.logFileStats();
+    LogFileStats query = analytics.logFileStats()!;
 
-    expect(query!.toolCount, 1,
+    expect(query.toolCount, 1,
         reason: 'There should have only been on tool that sent events');
-    expect(query!.flutterChannelCount, 0,
+    expect(query.flutterChannelCount, 0,
         reason:
             'The instance does not have flutter information so it should be 0');
 
@@ -841,14 +841,14 @@ $initialToolName=${ConfigHandler.dateStamp},$toolsMessageVersion
     // available should reflect in the query that there is 1 flutter channel present
     analytics.sendEvent(
         eventName: DashEvent.hotReloadTime, eventData: <String, dynamic>{});
-    LogFileStats? query2 = analytics.logFileStats();
+    LogFileStats? query2 = analytics.logFileStats()!;
 
-    expect(query2!.toolCount, 2,
+    expect(query2.toolCount, 2,
         reason: 'Two different analytics instances have '
             'been initialized and sent events');
-    expect(query2!.sessionCount, query!.sessionCount,
+    expect(query2.sessionCount, query.sessionCount,
         reason: 'The session should have remained the same');
-    expect(query2!.flutterChannelCount, 1,
+    expect(query2.flutterChannelCount, 1,
         reason: 'The first instance has flutter information initialized');
   });
 }
