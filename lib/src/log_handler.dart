@@ -65,6 +65,10 @@ class LogHandler {
         ));
 
   /// Get stats from the persisted log file
+  ///
+  /// Note that some developers may only be Dart
+  /// developers and will not have any data for flutter
+  /// related metrics
   LogFileStats? logFileStats() {
     // Parse each line of the log file through [LogItem],
     // some returned records may be null if malformed, they will be
@@ -89,8 +93,10 @@ class LogHandler {
     };
     for (LogItem record in records) {
       counter['sessions']!.add(record.sessionId);
-      counter['flutter_channel']!.add(record.flutterChannel);
       counter['tool']!.add(record.tool);
+      if (record.flutterChannel != null) {
+        counter['flutter_channel']!.add(record.flutterChannel!);
+      }
     }
 
     return LogFileStats(
@@ -126,18 +132,18 @@ class LogHandler {
 /// Data class for each record persisted on the client's machine
 class LogItem {
   final int sessionId;
-  final String flutterChannel;
+  final String? flutterChannel;
   final String host;
-  final String flutterVersion;
+  final String? flutterVersion;
   final String dartVersion;
   final String tool;
   final DateTime localTime;
 
   LogItem({
     required this.sessionId,
-    required this.flutterChannel,
+    this.flutterChannel,
     required this.host,
-    required this.flutterVersion,
+    this.flutterVersion,
     required this.dartVersion,
     required this.tool,
     required this.localTime,
@@ -217,12 +223,11 @@ class LogItem {
           as Map<String, Object?>)['value'] as String?;
 
       // If any of the above values are null, return null since that
-      // indicates the record is malformed
+      // indicates the record is malformed; note that `flutter_version`
+      // and `flutter_channel` are nullable fields in the log file
       final List<Object?> values = <Object?>[
         sessionId,
-        flutterChannel,
         host,
-        flutterVersion,
         dartVersion,
         tool,
         localTimeString,
@@ -236,9 +241,9 @@ class LogItem {
 
       return LogItem(
         sessionId: sessionId!,
-        flutterChannel: flutterChannel!,
+        flutterChannel: flutterChannel,
         host: host!,
-        flutterVersion: flutterVersion!,
+        flutterVersion: flutterVersion,
         dartVersion: dartVersion!,
         tool: tool!,
         localTime: localTime,
