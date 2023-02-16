@@ -1,6 +1,6 @@
-// Copyright 2014 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+// Copyright (c) 2023, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
 
 /// URL endpoint for sending Google Analytics Events
 const String kAnalyticsUrl = 'https://www.google-analytics.com/mp/collect';
@@ -62,7 +62,7 @@ const int kLogFileLength = 2500;
 const String kLogFileName = 'dash-analytics.log';
 
 /// The current version of the package, should be in line with pubspec version
-const String kPackageVersion = '0.1.0';
+const String kPackageVersion = '0.1.0-dev';
 
 /// The minimum length for a session
 const int kSessionDurationMinutes = 30;
